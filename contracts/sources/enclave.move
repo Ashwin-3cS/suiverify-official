@@ -1,8 +1,3 @@
-// Copyright (c), Mysten Labs, Inc.
-// SPDX-License-Identifier: Apache-2.0
-
-// Permissionless registration of an enclave.
-
 module suiverify::enclave;
 
 use std::bcs;
@@ -22,12 +17,6 @@ const EInvalidOwner: u64 = 3;
 // PCR2: Enclave application
 public struct Pcrs(vector<u8>, vector<u8>, vector<u8>) has copy, drop, store;
 
-// The expected PCRs.
-// - We only define the first 3 PCRs. One can define other
-//   PCRs and/or fields (e.g. user_data) if necessary as part
-//   of the config.
-// - See https://docs.aws.amazon.com/enclaves/latest/user/set-up-attestation.html#where
-//   for more information on PCRs.
 public struct EnclaveConfig<phantom T> has key {
     id: UID,
     name: String,
