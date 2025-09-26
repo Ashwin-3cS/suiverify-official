@@ -4,21 +4,14 @@
 /// - Integrates with Seal for encryption/decryption
 module suiverify::government_whitelist {
 
-use sui::object::{Self, UID, ID};
-use sui::tx_context::{Self, TxContext};
 use sui::table::{Self, Table};
-use sui::transfer;
 use sui::event;
-use std::vector;
-use std::string::{Self, String};
-use std::bcs;
 
 // Error codes
 const ENoAccess: u64 = 1;
 const EInvalidCap: u64 = 2;
 const EDuplicate: u64 = 3;
 const ENotInWhitelist: u64 = 4;
-const ENotOwner: u64 = 5;
 
 /// Government whitelist for KYC document access
 public struct GovWhitelist has key {
@@ -191,7 +184,7 @@ fun check_policy(caller: address, encryption_id: vector<u8>, whitelist: &GovWhit
     false
 }
 
-/// Seal approval function - called by Seal network to verify access
+/// Seal approval function - called by Seal key servers to verify access
 entry fun seal_approve(
     encryption_id: vector<u8>,
     whitelist: &GovWhitelist,
@@ -227,15 +220,6 @@ public fun can_access_document(
     check_policy(caller, encryption_id, whitelist)
 }
 
-#[test_only]
-public fun destroy_for_testing(whitelist: GovWhitelist, cap: GovCap) {
-    let GovWhitelist { id, government_addresses, registered_users } = whitelist;
-    table::drop(government_addresses);
-    table::drop(registered_users);
-    object::delete(id);
-    
-    let GovCap { id, whitelist_id: _ } = cap;
-    object::delete(id);
-}
+
 
 }
