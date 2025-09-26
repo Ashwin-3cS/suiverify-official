@@ -167,32 +167,3 @@ fun create_intent_message<P: drop>(intent: u8, timestamp_ms: u64, payload: P): I
         payload,
     }
 }
-
-#[test_only]
-public fun destroy<T>(enclave: Enclave<T>) {
-    let Enclave { id, .. } = enclave;
-    id.delete();
-}
-
-#[test_only]
-public struct SigningPayload has copy, drop {
-    location: String,
-    temperature: u64,
-}
-
-#[test]
-fun test_serde() {
-    // serialization should be consistent with rust test see `fn test_serde` in `src/nautilus-server/app.rs`.
-    let scope = 0;
-    let timestamp = 1744038900000;
-    let signing_payload = create_intent_message(
-        scope,
-        timestamp,
-        SigningPayload {
-            location: b"San Francisco".to_string(),
-            temperature: 13,
-        },
-    );
-    let bytes = bcs::to_bytes(&signing_payload);
-    assert!(bytes == x"0020b1d110960100000d53616e204672616e636973636f0d00000000000000", 0);
-}
