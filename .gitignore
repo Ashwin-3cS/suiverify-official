@@ -1,8 +1,10 @@
 
 #backend ignores
-nautilus-backend/
 **/target/
-
+nautilus_infra/verification-backend/venv
+nautilus_infra/verification-backend/app/services/__pycache__
+nautilus_infra/verification-backend/app/models/__pycache__
+nautilus_infra/verification-backend/app/routers/__pycache__
 
 # frontend ignores
 frontend/node_modules/
