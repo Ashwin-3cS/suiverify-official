@@ -16,6 +16,9 @@ use kafka_sui_processor::start_kafka_sui_processor;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Load environment variables from .env file
+    dotenvy::dotenv().ok();
+    
     // Initialize tracing
     tracing_subscriber::fmt::init();
 
