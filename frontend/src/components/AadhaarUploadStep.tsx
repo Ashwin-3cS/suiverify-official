@@ -220,7 +220,7 @@ const AadhaarUploadStep: React.FC<AadhaarUploadStepProps> = ({ onNext, onBack, o
           className="w-full py-3 px-6 rounded-xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed text-white"
           style={{ background: colors.gradients.primary }}
         >
-          Next
+         {isLoading ? "Extracting  data..." : "Next"}
         </button>
       </div>
     </form>
