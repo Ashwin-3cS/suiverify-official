@@ -1,0 +1,105 @@
+#!/bin/sh
+# Copyright (c), Mysten Labs, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+
+# added dummy ip for now
+# - Setup script for nautilus-server that acts as an init script
+# - Sets up Python and library paths
+# - Configures loopback network and /etc/hosts
+# - Waits for secrets.json to be passed from the parent instance. 
+# - Forwards VSOCK port 3000 to localhost:3000
+# - Optionally pulls secrets and sets in environmen variables.
+# - Launches nautilus-server
+
+set -e # Exit immediately if a command exits with a non-zero status
+echo "run.sh script is running"
+export PYTHONPATH=/lib/python3.11:/usr/local/lib/python3.11/lib-dynload:/usr/local/lib/python3.11/site-packages:/lib
+export LD_LIBRARY_PATH=/lib:$LD_LIBRARY_PATH
+
+# Assign an IP address to local loopback
+busybox ip addr add 127.0.0.1/32 dev lo
+busybox ip link set dev lo up
+
+# Add external service IP as loopback alias (static - matching secrets.json)
+echo "Adding external service IP as loopback alias..."
+busybox ip addr add 10.0.0.200/32 dev lo
+
+# Add a hosts record, pointing target service calls to local loopback
+echo "127.0.0.1   localhost" > /etc/hosts
+
+# Redirect external service address to localhost to force traffic through forwarder
+echo "127.0.0.1 10.0.0.200" >> /etc/hosts
+
+echo "Updated /etc/hosts file:"
+cat /etc/hosts
+
+# Test if hosts file redirection is working
+echo "Testing hosts file redirection:"
+nslookup 10.0.0.200 || echo "nslookup not available"
+ping -c 1 10.0.0.200 || echo "ping test completed"
+
+# Get a json blob with key/value pair for secrets
+echo "Waiting for secrets via VSOCK..."
+JSON_RESPONSE=$(socat - VSOCK-LISTEN:7777,reuseaddr)
+echo "Secrets received successfully"
+# Sets all key value pairs as env variables that will be referred by the server
+# This is shown as a example below. For production usecases, it's best to set the
+# keys explicitly rather than dynamically.
+echo "$JSON_RESPONSE" | jq -r 'to_entries[] | "\(.key)=\(.value)"' > /tmp/kvpairs ; while IFS="=" read -r key value; do export "$key"="$value"; done < /tmp/kvpairs ; rm -f /tmp/kvpairs
+
+echo "Environment variables configured successfully"
+
+# Run traffic forwarder in background and start the server
+# Forwards traffic from 127.0.0.x -> Port 443 at CID 3 Listening on port 800x
+# There is a vsock-proxy that listens for this and forwards to the respective domains
+
+# == ATTENTION: code should be generated here that added all hosts to forward traffic ===
+# Traffic-forwarder-block
+# External API forwarders configured for auction validation services
+
+# Forward external service - listen on the service IP address (static - matching secrets.json)
+echo "Starting external service traffic forwarder"
+socat TCP4-LISTEN:9092,bind=10.0.0.200,reuseaddr,fork VSOCK-CONNECT:3:9092 &
+SERVICE_FORWARDER_PID=$!
+
+# Also add iptables rule to redirect any traffic to service IP:9092 to localhost:9092
+echo "Adding iptables redirect for external service"
+iptables -t nat -A OUTPUT -d 10.0.0.200 -p tcp --dport 9092 -j REDIRECT --to-port 9092 || echo "iptables not available or failed"
+
+# Give forwarders time to start
+sleep 2
+
+# Test if service forwarder is actually listening on port 9092...
+echo "Testing if service forwarder is listening on port 9092..."
+netstat -ln | grep :9092 || echo "Port 9092 not listening"
+
+# Test VSOCK connection
+echo "Testing VSOCK connection to parent..."
+timeout 3 socat - VSOCK-CONNECT:3:9092 < /dev/null || echo "VSOCK connection to parent failed"
+
+# Listens on Local VSOCK Port 8000 (Python service) and forwards to localhost 8000
+socat VSOCK-LISTEN:8000,reuseaddr,fork TCP:localhost:8000 &
+
+# Listens on Local VSOCK Port 4000 (Rust service) and forwards to localhost 4000
+socat VSOCK-LISTEN:4000,reuseaddr,fork TCP:localhost:4000 &
+
+# Set Python path for verification-backend
+export PYTHONPATH="/usr/local/lib/python3.11/site-packages:$PYTHONPATH"
+
+echo "Starting Rust attestation-server on port 4000..."
+/attestation_server &
+RUST_SERVER_PID=$!
+
+echo "Starting Python verification service on port 8000..."
+cd /verification-backend
+python3 main.py &
+PYTHON_SERVER_PID=$!
+
+echo "Both services started:"
+echo "  - Rust attestation-server: PID $RUST_SERVER_PID (port 4000)"
+echo "  - Python verification service: PID $PYTHON_SERVER_PID (port 8000)"
+echo "  - Main exposed port: 8000 (Python service)"
+
+# Wait for both processes
+wait $RUST_SERVER_PID $PYTHON_SERVER_PID
