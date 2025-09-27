@@ -112,7 +112,7 @@ export function NFTClaimSuccessModal({ isOpen, onClose, nftData }: NFTClaimSucce
             </div>
 
             {/* User Address */}
-            <div className="rounded-xl p-4" style={{ backgroundColor: `${colors.primary}05`, border: `1px solid ${colors.primary}20` }}>
+            {/* <div className="rounded-xl p-4" style={{ backgroundColor: `${colors.primary}05`, border: `1px solid ${colors.primary}20` }}>
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm font-medium" style={{ color: colors.lightBlue }}>Owner Address</p>
                 <button
@@ -127,7 +127,7 @@ export function NFTClaimSuccessModal({ isOpen, onClose, nftData }: NFTClaimSucce
               <p className="font-mono text-sm p-2 rounded border break-all" style={{ color: colors.white, backgroundColor: colors.darkerNavy, borderColor: `${colors.primary}30` }}>
                 {nftData.userAddress}
               </p>
-            </div>
+            </div> */}
           </div>
 
           {/* Action Links */}
@@ -144,7 +144,7 @@ export function NFTClaimSuccessModal({ isOpen, onClose, nftData }: NFTClaimSucce
                 <ExternalLink className="w-4 h-4" />
                 View on Sui Explorer
               </a>
-              {nftData.walrusUrl && (
+              {/* {nftData.walrusUrl && (
                 <a
                   href={nftData.walrusUrl}
                   target="_blank"
@@ -155,7 +155,7 @@ export function NFTClaimSuccessModal({ isOpen, onClose, nftData }: NFTClaimSucce
                   <ExternalLink className="w-4 h-4" />
                   View on Walrus
                 </a>
-              )}
+              )} */}
             </div>
           </div>
 
