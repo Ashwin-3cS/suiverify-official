@@ -1,12 +1,13 @@
 import { SuiClient } from '@mysten/sui/client';
 import type { EventId, SuiEvent, SuiEventFilter } from '@mysten/sui/client';
+import { TESTNET_PACKAGE_ID } from '../Contansts';
 
 // Sui Configuration
 const fullnode = 'https://fullnode.testnet.sui.io:443';
 const client = new SuiClient({ url: fullnode });
 
 // Updated package ID
-const packageId = '';
+const packageId = TESTNET_PACKAGE_ID;
 
 // Configuration
 const POLLING_INTERVAL_MS = 2000; // 2 seconds
