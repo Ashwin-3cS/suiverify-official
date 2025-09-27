@@ -5,6 +5,7 @@ import LandingPage from './pages/LandingPage';
 import KycPage from './pages/KycPage';
 import User from './pages/User';
 import GovernmentDecryptionPage from './pages/GovernmentDecryptionPage';
+import AdminLogin from './pages/AdminLogin';
 
 const App: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/kyc" element={<KycPage />} />
           <Route path="/dashboard" element={<User />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<GovernmentDecryptionPage />} />
           <Route path="/admin/decrypt" element={<GovernmentDecryptionPage />} />
         </Routes>

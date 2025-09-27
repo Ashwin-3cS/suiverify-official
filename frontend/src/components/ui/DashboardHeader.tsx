@@ -1,6 +1,18 @@
 import { ConnectButton } from "@mysten/dapp-kit";
+import { useNavigate, useLocation } from "react-router-dom";
+import { LogOut } from "lucide-react";
 
 const DashboardHeader = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    
+    const isAdminRoute = location.pathname.startsWith('/admin');
+    
+    const handleLogout = () => {
+        localStorage.removeItem('adminAuthenticated');
+        localStorage.removeItem('adminUsername');
+        navigate('/admin/login');
+    };
     return (
         <div className="relative z-50">
             {/* Navigation Bar */}
@@ -13,14 +25,16 @@ const DashboardHeader = () => {
 
                     {/* Right Side - Balance and Connect Wallet */}
                     <div className="flex items-center space-x-4 relative z-50">
-                        {/* Balance Display */}
-                        {/* <div className="flex items-center space-x-2 font-bold">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-            </div> */}
+                        {/* Logout Button - Only show on admin routes */}
+                        {isAdminRoute && (
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                Logout
+                            </button>
+                        )}
 
                         <ConnectButton
                             connectText="Connect Wallet"
