@@ -501,23 +501,23 @@ function KycPage() {
                 </motion.div>
               
                 <div className="rounded-2xl p-4 mb-6" style={{ backgroundColor: `${colors.primary}10`, border: `1px solid ${colors.primary}30` }}>
-                  <div className="space-y-2 text-sm" style={{ color: colors.white }}>
+                  {/* <div className="space-y-2 text-sm" style={{ color: colors.white }}>
                     <p>✅ Blockchain verification confirmed</p>
                     <p>✅ Documents encrypted with Seal protocol</p>
                     <p>✅ Secure storage on Walrus network</p>
                     <p>✅ Ready to claim DID NFT</p>
-                  </div>
+                  </div> */}
                 
                   {encryptionResult && (
                     <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${colors.primary}30` }}>
                       <p className="text-xs font-semibold mb-2" style={{ color: colors.white }}>Encryption Details:</p>
                       <div className="space-y-1 text-xs font-mono" style={{ color: colors.lightBlue }}>
                         <p><strong>Blob ID:</strong> {encryptionResult.blobId}</p>
-                        <p><strong>Encryption ID:</strong> {encryptionResult.encryptionId}</p>
-                        <p><strong>Sui Reference:</strong> {encryptionResult.suiRef}</p>
+                        {/* <p><strong>Encryption ID:</strong> {encryptionResult.encryptionId}</p> */}
+                        {/* <p><strong>Sui Reference:</strong> {encryptionResult.suiRef}</p> */}
                       </div>
                       <div className="mt-2 space-y-1">
-                        <a 
+                        {/* <a 
                           href={DocumentEncryptionService.getBlobUrl(encryptionResult.blobId!)}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -525,7 +525,7 @@ function KycPage() {
                           style={{ color: colors.primary }}
                         >
                           🔗 View on Walrus
-                        </a>
+                        </a> */}
                         <a 
                           href={DocumentEncryptionService.getSuiExplorerUrl(encryptionResult.suiRef!, 'object')}
                           target="_blank"
