@@ -20,10 +20,10 @@ async def connect_to_mongo():
     """Create database connection"""
     try:
         # Get MongoDB URI from environment variables
-        mongodb_uri = os.getenv(
-            "MONGODB_URI", 
-            "" # URI will be provided
-        )
+        mongodb_uri = os.getenv("MONGODB_URI")
+        
+        if not mongodb_uri:
+            raise ValueError("MONGODB_URI environment variable is required but not set")
         
         # Create MongoDB client
         mongodb.client = AsyncIOMotorClient(mongodb_uri)

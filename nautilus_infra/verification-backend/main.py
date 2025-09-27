@@ -13,7 +13,7 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-from app.routers import aadhaar, face, otp, users, kyc, encryption, credentials
+from app.routers import aadhar, face, otp, user, kyc, encryption, credentials
 from app.services.ocr_service import OCRService
 from app.services.face_recognition_service import get_face_recognition_service
 from app.services.otp_service import OTPService
@@ -81,9 +81,9 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(users.router, prefix="/api", tags=["User Management"])
+app.include_router(user.router, prefix="/api", tags=["User Management"])
 app.include_router(kyc.router, prefix="/api", tags=["KYC Verification"])
-app.include_router(aadhaar.router, prefix="/api/aadhaar", tags=["Aadhaar OCR"])
+app.include_router(aadhar.router, prefix="/api/aadhaar", tags=["Aadhaar OCR"])
 app.include_router(face.router, prefix="/api/face", tags=["Face Recognition"])
 app.include_router(otp.router, prefix="/api/otp", tags=["OTP Verification"])
 app.include_router(encryption.router, prefix="/api", tags=["Encryption Metadata"])
