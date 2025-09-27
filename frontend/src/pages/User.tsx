@@ -323,7 +323,7 @@ const User: React.FC = () => {
                                                             }}>
                                                             {verification.title}
                                                         </h3>
-                                                        <p className="text-sm leading-relaxed text-center opacity-80 mb-6" style={{ color: colors.lightBlue }}>
+                                                        <p className="text-sm leading-relaxed text-center opacity-80 mb-4" style={{ color: colors.lightBlue }}>
                                                             {verification.description}
                                                         </p>
 
@@ -338,12 +338,23 @@ const User: React.FC = () => {
                                                         >
                                                             Start Verification
                                                         </motion.button>
+                                                        <p className="text-xs text-center mt-3" style={{ color: colors.lightBlue, fontWeight: '500' }}>
+                                                            Accepted by <span style={{ color: colors.primary }}>Alphafi</span> and <span style={{ color: colors.primary }}>Suilend</span>
+                                                        </p>
                                                     </motion.div>
                                                 </div>
 
-                                                {/* Corner Accent */}
-                                                <div className="absolute top-4 right-4 w-8 h-8 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
+                                                <div className="absolute top-4 left-4 w-8 h-8 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
                                                     <div className="w-full h-full border-2 border-r-0 border-b-0 rounded-tl-lg" style={{ borderColor: colors.primary }}></div>
+                                                </div>
+                                                <div className="absolute top-4 right-4 w-8 h-8 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
+                                                    <div className="w-full h-full border-2 border-l-0 border-b-0 rounded-tr-lg" style={{ borderColor: colors.primary }}></div>
+                                                </div>
+                                                <div className="absolute bottom-4 left-4 w-8 h-8 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
+                                                    <div className="w-full h-full border-2 border-r-0 border-t-0 rounded-bl-lg" style={{ borderColor: colors.primary }}></div>
+                                                </div>
+                                                <div className="absolute bottom-4 right-4 w-8 h-8 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
+                                                    <div className="w-full h-full border-2 border-l-0 border-t-0 rounded-br-lg" style={{ borderColor: colors.primary }}></div>
                                                 </div>
                                             </motion.div>
                                         );
