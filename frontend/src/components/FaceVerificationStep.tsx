@@ -26,80 +26,90 @@ interface FaceVerificationStepProps {
   aadhaarData: AadhaarData;
 }
 
-const FaceVerificationStep: React.FC<FaceVerificationStepProps> = ({ onNext, onBack, aadhaarData }) => {
+const FaceVerificationStep: React.FC<FaceVerificationStepProps> = ({ onNext, onBack }) => {
   const webcamRef = useRef<Webcam>(null);
   const [faceImage, setFaceImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [faceResult, setFaceResult] = useState<FaceMatchResult | null>(null);
 
-  const API_BASE = 'http://localhost:8000';
+  // const API_BASE = 'http://localhost:8000';
 
-  const handleFaceVerification = async ( capturedImage: string) => {
-    setIsLoading(true);
-    setError(null);
+  // const handleFaceVerification = async () => {
+  //   setIsLoading(true);
+  //   setError(null);
     
-    try {
-      if (!aadhaarData?.aadhaar_photo_base64) {
-        setError('Aadhaar photo not found. Please upload Aadhaar card first.');
-        return;
-      }
+  //   try {
+  //     if (!aadhaarData?.aadhaar_photo_base64) {
+  //       setError('Aadhaar photo not found. Please upload Aadhaar card first.');
+  //       return;
+  //     }
 
-      if (!aadhaarData?.phone_number) {
-        setError('Phone number not found in Aadhaar data. Cannot proceed with verification.');
-        return;
-      }
+  //     if (!aadhaarData?.phone_number) {
+  //       setError('Phone number not found in Aadhaar data. Cannot proceed with verification.');
+  //       return;
+  //     }
       
-      const base64Image = capturedImage.includes(',') ? capturedImage.split(',')[1] : capturedImage;
+  //     const base64Image = capturedImage.includes(',') ? capturedImage.split(',')[1] : capturedImage;
       
-      const response = await fetch(`${API_BASE}/api/face/verify-face`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          aadhaar_photo_base64: aadhaarData.aadhaar_photo_base64,
-          live_photo_base64: base64Image,
-          phone_number: aadhaarData.phone_number
-        }),
-      });
+  //     const response = await fetch(`${API_BASE}/api/face/verify-face`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         aadhaar_photo_base64: aadhaarData.aadhaar_photo_base64,
+  //         live_photo_base64: base64Image,
+  //         phone_number: aadhaarData.phone_number
+  //       }),
+  //     });
       
-      const result = await response.json();
+  //     const result = await response.json();
       
-      if (!response.ok) {
-        const errorMessage = result.detail || result.message || `HTTP error! status: ${response.status}`;
-        setError(errorMessage);
-        return;
-      }
+  //     if (!response.ok) {
+  //       const errorMessage = result.detail || result.message || `HTTP error! status: ${response.status}`;
+  //       setError(errorMessage);
+  //       return;
+  //     }
       
-      if (result.success) {
-        if (result.data && result.data.match) {
-          setFaceResult(result.data);
-          // Auto proceed to next step after successful face match
-          setTimeout(() => {
-            onNext();
-          }, 2000);
-        } else {
-          // Handle face mismatch case
-          const failureMessage = result.data?.message || result.message || 'Face verification failed. The faces do not match with sufficient confidence.';
-          setError(`Face verification failed: ${failureMessage}`);
-        }
-      } else {
-        setError(result.message || 'Face comparison failed. Please try again.');
-      }
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Face verification failed';
-      setError(errorMsg);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     if (result.success) {
+  //       if (result.data && result.data.match) {
+  //         setFaceResult(result.data);
+  //         // Auto proceed to next step after successful face match
+  //         setTimeout(() => {
+  //           onNext();
+  //         }, 2000);
+  //       } else {
+  //         // Handle face mismatch case
+  //         const failureMessage = result.data?.message || result.message || 'Face verification failed. The faces do not match with sufficient confidence.';
+  //         setError(`Face verification failed: ${failureMessage}`);
+  //       }
+  //     } else {
+  //       setError(result.message || 'Face comparison failed. Please try again.');
+  //     }
+  //   } catch (err) {
+  //     const errorMsg = err instanceof Error ? err.message : 'Face verification failed';
+  //     setError(errorMsg);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const capturePhoto = () => {
     const imageSrc = webcamRef.current?.getScreenshot();
     if (imageSrc) {
       setFaceImage(imageSrc);
-      handleFaceVerification(imageSrc);
+      // Simulate successful face verification
+      setIsLoading(true);
+      setTimeout(() => {
+        setFaceResult({
+          match: true,
+          confidence: 95.5,
+          message: 'Face verification successful',
+          face_distance: 0.25
+        });
+        setIsLoading(false);
+      }, 1500);
     }
   };
 
