@@ -1,5 +1,5 @@
 {
-  "name": "suiverify-frontend",
+  "name": "user-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -19,9 +19,10 @@
     "@tanstack/react-query": "^5.90.1",
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.544.0",
+    "ogl": "^1.0.11",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router-dom": "^7.9.3",
+    "react-router-dom": "^7.9.1",
     "react-toastify": "^11.0.5",
     "react-webcam": "^7.2.0",
     "tailwindcss": "^4.1.13"
