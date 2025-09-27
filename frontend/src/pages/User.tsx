@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { credentialService, type CredentialData, type CredentialStats } from '../services/credentialService';
 import { Shield, FileText, CheckCircle, Clock, AlertCircle, Calendar, Users } from 'lucide-react';
 import { colors } from '../brand';
-import DashboardHeader from '../components/ui/dashboardHeader';
+import DashboardHeader from '../components/ui/DashboardHeader';
 
 const User: React.FC = () => {
     const navigate = useNavigate();

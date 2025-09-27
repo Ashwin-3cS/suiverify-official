@@ -5,7 +5,7 @@ import { SessionKey } from '@mysten/seal';
 import { AlertCircle, Clock, FileText, Shield, Search, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { colors } from '../brand';
-import DashboardHeader from '../components/ui/dashboardHeader';
+import DashboardHeader from '../components/ui/DashboardHeader';
 import { documentDecryptionService, DocumentDecryptionService, type DocumentMetadata } from '../services/decryptionService';
 
 interface DecryptionData {
