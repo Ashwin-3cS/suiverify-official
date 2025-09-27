@@ -19,6 +19,7 @@ from app.services.face_recognition_service import get_face_recognition_service
 from app.services.otp_service import OTPService
 from app.services.user_service import get_user_service
 from app.services.encryption_service import encryption_service
+from app.services.kafka_service import get_kafka_service
 from app.database import connect_to_mongo, close_mongo_connection
 
 # Configure logging
@@ -55,6 +56,19 @@ async def lifespan(app: FastAPI):
     face_recognition_service = get_face_recognition_service()
     otp_service = OTPService()
     
+    # Test Kafka connection
+    kafka_service = get_kafka_service()
+    try:
+        kafka_health = await kafka_service.health_check()
+        if kafka_health['connected']:
+            logger.info(f"✅ Kafka connected successfully to {kafka_health['server']}")
+        else:
+            logger.warning(f"⚠️ Kafka connection failed: {kafka_health['error']}")
+            logger.warning("Application will continue without Kafka (messages will be logged)")
+    except Exception as e:
+        logger.warning(f"⚠️ Kafka health check failed: {e}")
+        logger.warning("Application will continue without Kafka (messages will be logged)")
+    
     logger.info("All services initialized successfully")
     
     yield
@@ -62,6 +76,12 @@ async def lifespan(app: FastAPI):
     # Cleanup
     logger.info("Shutting down SuiVerify System...")
     await close_mongo_connection()
+    
+    # Close Kafka service
+    try:
+        await kafka_service.close()
+    except Exception as e:
+        logger.warning(f"Error closing Kafka service: {e}")
 
 # Create FastAPI app
 app = FastAPI(
@@ -92,6 +112,10 @@ app.include_router(credentials.router, prefix="/api", tags=["Credentials Managem
 @app.get("/")
 async def root():
     """Health check endpoint"""
+    # Get Kafka status
+    kafka_service = get_kafka_service()
+    kafka_status = "connected" if kafka_service.is_connected else "disconnected"
+    
     return {
         "message": "SuiVerify API - Identity Verification System",
         "version": "1.0.0",
@@ -102,7 +126,8 @@ async def root():
             "ocr": "ready",
             "face_recognition": "ready", 
             "otp": "ready",
-            "encryption_metadata": "ready"
+            "encryption_metadata": "ready",
+            "kafka": kafka_status
         }
     }
 

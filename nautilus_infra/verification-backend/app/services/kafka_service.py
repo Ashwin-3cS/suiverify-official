@@ -18,16 +18,15 @@ logger = logging.getLogger(__name__)
 
 class KafkaService:
     def __init__(self):
-        self.kafka_server = os.getenv('KAFKA_SERVER', '')
-        self.topic = 'verified-user-data'
+        # Get Kafka configuration from environment variables
+        self.kafka_host = os.getenv('KAFKA_HOST', 'localhost')
+        self.kafka_port = int(os.getenv('KAFKA_PORT', '9092'))
+        self.kafka_server = f"{self.kafka_host}:{self.kafka_port}"
+        self.topic = os.getenv('KAFKA_TOPIC', 'verified-user-data')
         
-        # Extract host and port
-        if ':' in self.kafka_server:
-            self.host, self.port = self.kafka_server.split(':')
-            self.port = int(self.port)
-        else:
-            self.host = self.kafka_server
-            self.port = 9092
+        # Connection status
+        self.is_connected = False
+        self.connection_error = None
         
         # Confluent Kafka Producer configuration
         self.producer_config = {
@@ -41,6 +40,69 @@ class KafkaService:
         }
         
         self.producer = None
+        
+        # Log configuration on initialization
+        logger.info(f"Kafka Service initialized with:")
+        logger.info(f"  Host: {self.kafka_host}")
+        logger.info(f"  Port: {self.kafka_port}")
+        logger.info(f"  Server: {self.kafka_server}")
+        logger.info(f"  Topic: {self.topic}")
+    
+    async def test_connection(self) -> bool:
+        """Test Kafka connection and update connection status"""
+        try:
+            logger.info(f"Testing Kafka connection to {self.kafka_server}...")
+            
+            # Test basic network connectivity first
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(5)  # 5 second timeout
+            result = sock.connect_ex((self.kafka_host, self.kafka_port))
+            sock.close()
+            
+            if result != 0:
+                self.connection_error = f"Cannot connect to {self.kafka_host}:{self.kafka_port} - Connection refused"
+                self.is_connected = False
+                logger.error(f"❌ Kafka connection failed: {self.connection_error}")
+                return False
+            
+            # Test Kafka producer creation
+            try:
+                test_producer = Producer(self.producer_config)
+                # Get cluster metadata to verify connection
+                metadata = test_producer.list_topics(timeout=10)
+                test_producer.flush()
+                
+                self.is_connected = True
+                self.connection_error = None
+                logger.info(f"✅ Kafka connection successful to {self.kafka_server}")
+                logger.info(f"   Available topics: {len(metadata.topics)} topics found")
+                return True
+                
+            except Exception as kafka_error:
+                self.connection_error = f"Kafka producer error: {str(kafka_error)}"
+                self.is_connected = False
+                logger.error(f"❌ Kafka producer test failed: {self.connection_error}")
+                return False
+                
+        except Exception as e:
+            self.connection_error = f"Connection test error: {str(e)}"
+            self.is_connected = False
+            logger.error(f"❌ Kafka connection test failed: {self.connection_error}")
+            return False
+    
+    async def health_check(self) -> dict:
+        """Health check for Kafka service"""
+        await self.test_connection()
+        return {
+            "service": "kafka",
+            "status": "healthy" if self.is_connected else "unhealthy",
+            "host": self.kafka_host,
+            "port": self.kafka_port,
+            "server": self.kafka_server,
+            "topic": self.topic,
+            "connected": self.is_connected,
+            "error": self.connection_error
+        }
     
     def _create_evidence_hash(self, aadhaar_number: str, dob: str, phone_number: str) -> str:
         """Create SHA256 hash from OCR data"""
@@ -107,7 +169,7 @@ class KafkaService:
             webhook_url = os.getenv('KAFKA_WEBHOOK_URL')
             if not webhook_url:
                 # Create a simple HTTP endpoint URL
-                webhook_url = f"http://{self.host}:8080/kafka/messages"
+                webhook_url = f"http://{self.kafka_host}:8080/kafka/messages"
             
             async with httpx.AsyncClient(timeout=10.0) as client:
                 response = await client.post(
@@ -155,7 +217,7 @@ class KafkaService:
                 "verified_at": datetime.now().isoformat()
             }
             
-            logger.info(f"Sending verification data to {self.host}:{self.port}")
+            logger.info(f"Sending verification data to {self.kafka_host}:{self.kafka_port}")
             logger.info(f"Message: {json.dumps(verification_message, indent=2)}")
             
             # Try multiple approaches (prioritize working methods from tests)
