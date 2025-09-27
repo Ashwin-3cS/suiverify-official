@@ -5,10 +5,13 @@ import { fromHex } from '@mysten/sui/utils';
 
 // Configuration matching the encryption service
 const SUI_CLIENT = new SuiClient({ url: 'https://fullnode.testnet.sui.io:443' });
-const PACKAGE_ID = '';
+const PACKAGE_ID = '0xcfedf4e2445497ba1a5d57349d6fc116b194eca41524f46f593c63a7a70a8eab';
 
 // Government whitelist ID (should match the deployed whitelist)
-const GOVERNMENT_WHITELIST_ID = '';
+const GOVERNMENT_WHITELIST_ID = '0xca700b2604763639ba3fbf0237d4f1ab34470ac509d407d34030621b1a254747';
+
+// Walrus configuration
+const WALRUS_AGGREGATOR_URL = import.meta.env.VITE_WALRUS_AGGREGATOR_URL ;
 
 // Seal server configurations
 const serverObjectIds = [
@@ -198,6 +201,7 @@ export class DocumentDecryptionService {
     onProgress?: (progress: string) => void
   ): Promise<ArrayBuffer | null> {
     const reliableAggregators = [
+      WALRUS_AGGREGATOR_URL,
       'https://aggregator.walrus-testnet.walrus.space',
       'https://wal-aggregator-testnet.staketab.org',
       'https://aggregator.walrus.banansen.dev',
