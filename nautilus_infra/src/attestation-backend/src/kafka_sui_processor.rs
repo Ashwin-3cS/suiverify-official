@@ -647,9 +647,23 @@ fn extract_user_did_id(output: &str) -> Option<String> {
 
 // Function to start the RSKafka-Sui processor as a background task
 pub async fn start_kafka_sui_processor(keypair: Ed25519KeyPair) -> Result<()> {
+    // Read Kafka configuration from environment variables
+    let kafka_host = std::env::var("KAFKA_HOST")
+        .unwrap_or_else(|_| "localhost".to_string());
+    let kafka_port = std::env::var("KAFKA_PORT")
+        .unwrap_or_else(|_| "9092".to_string());
+    let kafka_topic = std::env::var("KAFKA_TOPIC")
+        .unwrap_or_else(|_| "verified-user-data".to_string());
+    
+    let bootstrap_servers = format!("{}:{}", kafka_host, kafka_port);
+    
+    info!("Starting Kafka processor with configuration:");
+    info!("  Bootstrap servers: {}", bootstrap_servers);
+    info!("  Topic: {}", kafka_topic);
+    
     let mut processor = RSKafkaSuiProcessor::new(
-        "68.183.40.65:9092",           // Your Kafka bootstrap server
-        "verified-user-data",           // Topic
+        &bootstrap_servers,
+        &kafka_topic,
         0,                              // Partition (start with partition 0)
         keypair,
     )?;
