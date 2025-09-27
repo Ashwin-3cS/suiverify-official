@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import LightRays from '../components/ui/lightRays';
 import LandingHeader from '../components/ui/landingHeader';
-import { colors } from '../brand';
+import { colors } from '../../src/brand';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();

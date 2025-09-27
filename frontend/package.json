@@ -17,6 +17,7 @@
     "@mysten/wallet-standard": "^0.12.0",
     "@tailwindcss/vite": "^4.1.13",
     "@tanstack/react-query": "^5.90.1",
+    "framer-motion": "^12.23.22",
     "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
