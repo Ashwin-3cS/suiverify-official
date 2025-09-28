@@ -533,7 +533,7 @@ function GovernmentDecryptionPage() {
         {/* Decrypted Files Dialog */}
         {isDialogOpen && decryptedFileUrls.length > 0 && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="rounded-3xl p-6 max-w-4xl max-h-[90vh] overflow-auto" style={{ backgroundColor: colors.darkNavy }}>
+            <div className="rounded-3xl p-6 max-w-6xl max-h-[90vh] overflow-auto" style={{ backgroundColor: colors.darkNavy }}>
               <div className="flex justify-between items-center mb-4" style={{ borderBottom: `1px solid ${colors.primary}30` }}>
                 <h3 className="text-xl font-semibold" style={{ color: colors.white }}>Decrypted Documents</h3>
                 <button
@@ -572,11 +572,11 @@ function GovernmentDecryptionPage() {
                           Download
                         </button>
                       </div>
-                      <div className="text-center">
+                      <div className="w-full">
                         <img 
                           src={url} 
                           alt={`Decrypted document ${index + 1}`} 
-                          className="max-w-full max-h-96 object-contain mx-auto border rounded-2xl"
+                          className="w-full h-auto border rounded-2xl"
                           style={{ borderColor: `${colors.primary}30` }}
                         />
                       </div>
