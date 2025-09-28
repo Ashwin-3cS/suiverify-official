@@ -136,7 +136,7 @@ const User: React.FC = () => {
                                 className="text-xl"
                                 style={{ color: colors.lightBlue }}
                             >
-                                View and manage credentials stored in your identity wallet
+                                View and manage identities stored in your wallet
                             </motion.p>
                         </motion.div>
                     </div>
