@@ -1,6 +1,6 @@
 {
-  "name": "@suiverify/sdk",
-  "version": "1.0.0",
+  "name": "suiverify-sdk",
+  "version": "1.0.1",
   "description": "SuiVerify SDK for verifying Nautilus signatures and DID NFT authenticity",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

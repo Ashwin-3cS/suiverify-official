@@ -13,13 +13,13 @@ A TypeScript SDK for verifying Nautilus enclave signatures and DID NFT authentic
 ## Installation
 
 ```bash
-npm install @suiverify/sdk
+npm install suiverify-sdk
 ```
 
 ## Quick Start
 
 ```typescript
-import { SuiVerifySDK } from '@suiverify/sdk';
+import { SuiVerifySDK } from 'suiverify-sdk';
 
 // Initialize SDK
 const sdk = new SuiVerifySDK({
