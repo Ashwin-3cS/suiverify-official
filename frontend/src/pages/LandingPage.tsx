@@ -95,7 +95,7 @@ const LandingPage: React.FC = () => {
               className="text-lg md:text-xl lg:text-2xl mb-3 max-w-4xl mx-auto leading-relaxed"
               style={{ color: colors.lightBlue }}
             >
-              Secure, Private, and Blockchain-Powered Identity Verification on SUI Ecosystem
+              Secure, Private, and Verifiable Identity Infrastructure on Sui Ecosystem
             </motion.p>
 
             {/* CTA Buttons */}
@@ -143,7 +143,7 @@ const LandingPage: React.FC = () => {
               {[
                 {
                   title: "Verifiable computation",
-                  description: "Advanced OCR and facial recognition technology",
+                  description: "Identity verification using Nautilus",
                   icon: (
                     <svg className="w-8 h-8" style={{ color: colors.primary }} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -163,7 +163,7 @@ const LandingPage: React.FC = () => {
                 },
                 {
                   title: "Privacy First",
-                  description: "Your data is encrypted and stored securely using Seal",
+                  description: "Your data is encrypted using Seal and stored securely in Walrus",
                   icon: (
                     <svg className="w-8 h-8" style={{ color: colors.primary }} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -327,7 +327,7 @@ const LandingPage: React.FC = () => {
           </div>
 
           {/* Modern Feature Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto px-4 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto px-4 mb-12">
             {[
               {
                 title: "Upload Document",
@@ -458,7 +458,7 @@ const LandingPage: React.FC = () => {
                 <div className="relative z-10">
                   <div className="flex items-center space-x-4 mb-6">
                     <div className="w-16 h-16 rounded-3xl flex items-center justify-center shadow-xl" style={{ backgroundColor: colors.lightBlue }}>
-                    <img src="/Seal_logo.png" alt="Nautilus" className="w-12 rounded-full h-8 object-contain" />
+                      <img src="/Seal_logo.png" alt="Nautilus" className="w-12 rounded-full h-8 object-contain" />
 
                     </div>
                     <h3 className="text-2xl font-bold" style={{ color: colors.white }}>Seal</h3>
@@ -476,7 +476,7 @@ const LandingPage: React.FC = () => {
                 <div className="relative z-10">
                   <div className="flex items-center space-x-4 mb-6">
                     <div className="w-16 h-16 rounded-3xl flex items-center justify-center shadow-xl" style={{ background: colors.gradients.primary }}>
-                    <img src="/walrus.svg" alt="Nautilus" className="w-12 h-8 object-contain" />
+                      <img src="/walrus.svg" alt="Nautilus" className="w-12 h-8 object-contain" />
                     </div>
                     <h3 className="text-2xl font-bold" style={{ color: colors.white }}>Walrus</h3>
                   </div>
@@ -493,10 +493,10 @@ const LandingPage: React.FC = () => {
               <div className="w-[500px] h-[500px] relative">
                 {/* SUI Logo in Center */}
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-10">
-                  <motion.div 
+                  <motion.div
                     className="w-24 h-24 rounded-full flex items-center justify-center shadow-xl border-2 cursor-pointer"
                     style={{ background: colors.gradients.primary, borderColor: colors.white }}
-                    whileHover={{ 
+                    whileHover={{
                       scale: 1.2,
                       rotate: 360,
                       boxShadow: `0 0 50px ${colors.primary}80`
@@ -504,19 +504,19 @@ const LandingPage: React.FC = () => {
                     whileTap={{ scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
                   >
-                    <motion.img 
-                      src="/suilogo.svg" 
-                      alt="SUI" 
+                    <motion.img
+                      src="/suilogo.svg"
+                      alt="SUI"
                       className="w-12 h-12 filter brightness-0 invert"
-                      whileHover={{ 
+                      whileHover={{
                         scale: 1.1,
                         rotate: -360
                       }}
                       transition={{ duration: 0.8 }}
                     />
                   </motion.div>
-                  <motion.p 
-                    className="text-sm font-semibold mt-2" 
+                  <motion.p
+                    className="text-sm font-semibold mt-2"
                     style={{ color: colors.white }}
                     whileHover={{ scale: 1.05 }}
                   >
@@ -566,11 +566,11 @@ const LandingPage: React.FC = () => {
 
                 {/* Walrus - Storage Layer */}
                 <div className="absolute bottom-8 left-8">
-                  <motion.div 
+                  <motion.div
                     className="backdrop-blur-sm rounded-2xl p-4 border shadow-lg max-w-[140px] cursor-pointer group"
                     style={{ backgroundColor: colors.darkNavy, borderColor: colors.primary }}
-                    whileHover={{ 
-                      scale: 1.1, 
+                    whileHover={{
+                      scale: 1.1,
                       rotate: 5,
                       boxShadow: `0 20px 40px ${colors.primary}40`
                     }}
@@ -578,10 +578,10 @@ const LandingPage: React.FC = () => {
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <div className="flex flex-col items-center text-center">
-                      <motion.div 
-                        className="w-12 h-12 rounded-full flex items-center justify-center mb-2" 
+                      <motion.div
+                        className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
                         style={{ backgroundColor: colors.primary }}
-                        whileHover={{ 
+                        whileHover={{
                           rotate: 360,
                           scale: 1.2
                         }}
@@ -597,11 +597,11 @@ const LandingPage: React.FC = () => {
 
                 {/* Seal - Encryption Layer */}
                 <div className="absolute bottom-8 right-8">
-                  <motion.div 
+                  <motion.div
                     className="backdrop-blur-sm rounded-2xl p-4 border shadow-lg max-w-[140px] cursor-pointer group"
                     style={{ backgroundColor: colors.darkNavy, borderColor: colors.primary }}
-                    whileHover={{ 
-                      scale: 1.1, 
+                    whileHover={{
+                      scale: 1.1,
                       rotate: -5,
                       y: -10,
                       boxShadow: `0 20px 40px ${colors.lightBlue}40`
@@ -610,10 +610,10 @@ const LandingPage: React.FC = () => {
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <div className="flex flex-col items-center text-center">
-                      <motion.div 
-                        className="w-12 h-12 rounded-full flex items-center justify-center mb-2" 
+                      <motion.div
+                        className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
                         style={{ backgroundColor: colors.lightBlue }}
-                        whileHover={{ 
+                        whileHover={{
                           scale: [1, 1.3, 1],
                           borderRadius: ["50%", "30%", "50%"]
                         }}
@@ -629,11 +629,11 @@ const LandingPage: React.FC = () => {
 
                 {/* Nautilus - Computation Layer */}
                 <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
-                  <motion.div 
+                  <motion.div
                     className="backdrop-blur-sm rounded-2xl p-4 border shadow-lg max-w-[140px] cursor-pointer group"
                     style={{ backgroundColor: colors.darkNavy, borderColor: colors.primary }}
-                    whileHover={{ 
-                      scale: 1.1, 
+                    whileHover={{
+                      scale: 1.1,
                       rotateX: 15,
                       rotateY: 15,
                       boxShadow: `0 20px 40px ${colors.primary}40`
@@ -642,10 +642,10 @@ const LandingPage: React.FC = () => {
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <div className="flex flex-col items-center text-center">
-                      <motion.div 
-                        className="w-12 h-12 rounded-full flex items-center justify-center mb-2" 
+                      <motion.div
+                        className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
                         style={{ backgroundColor: colors.primary }}
-                        whileHover={{ 
+                        whileHover={{
                           rotate: [0, 180, 360],
                           scale: [1, 1.1, 1]
                         }}
@@ -670,18 +670,18 @@ const LandingPage: React.FC = () => {
 
                 {/* Ecosystem Label */}
                 <div className="absolute top-0 left-0 right-0 text-center">
-                  <motion.div 
+                  <motion.div
                     className="inline-block backdrop-blur-sm rounded-full px-4 py-2 border cursor-pointer"
                     style={{ backgroundColor: colors.darkNavy, borderColor: colors.primary }}
-                    whileHover={{ 
+                    whileHover={{
                       scale: 1.05,
                       boxShadow: `0 10px 30px ${colors.primary}30`
                     }}
                     whileTap={{ scale: 0.95 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
                   >
-                    <motion.p 
-                      className="text-sm font-semibold" 
+                    <motion.p
+                      className="text-sm font-semibold"
                       style={{ color: colors.lightBlue }}
                       whileHover={{ color: colors.primary }}
                       transition={{ duration: 0.3 }}
