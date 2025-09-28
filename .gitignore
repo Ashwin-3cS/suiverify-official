@@ -19,4 +19,5 @@ frontend/.env
 contracts/build
 
 
+nautilus_infra/secrets.json
 
