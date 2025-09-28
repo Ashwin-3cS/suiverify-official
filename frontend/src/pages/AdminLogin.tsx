@@ -168,12 +168,12 @@ const AdminLogin: React.FC = () => {
                             type="submit"
                             disabled={loading || !username || !password}
                             className={`w-full py-3 px-6 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${loading || !username || !password
-                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                    ? 'text-gray-200 cursor-not-allowed'
                                     : 'text-white'
                                 }`}
                             style={{
                                 background: loading || !username || !password
-                                    ? 'transparent'
+                                    ? '#9ca3af'
                                     : colors.gradients.primary
                             }}
                             whileHover={!loading && username && password ? { scale: 1.02 } : {}}

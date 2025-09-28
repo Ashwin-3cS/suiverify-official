@@ -21,6 +21,7 @@ const LandingHeader = () => {
           <div className="hidden md:flex items-center space-x-8">
             <a href="#howitworks" className="text-white hover:text-[#4DA2FF] font-semibold transition-colors">How It Works</a>
             <a href="#features" className="text-white hover:text-[#4DA2FF] font-semibold transition-colors">Features</a>
+            <a href="https://suiverify.gitbook.io/suiverify/" target="_blank" className="text-white hover:text-[#4DA2FF] font-semibold transition-colors">Docs</a>
           </div>
 
           {/* Right Side - Balance and Connect Wallet */}

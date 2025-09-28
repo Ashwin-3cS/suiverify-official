@@ -121,7 +121,7 @@ const LandingPage: React.FC = () => {
               <motion.a
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                href="https://kiran-4.gitbook.io/suiverify/" target="_blank" rel="noopener noreferrer"
+                href="https://suiverify.gitbook.io/suiverify/" target="_blank" rel="noopener noreferrer"
                 className="font-bold px-12 py-3 cursor-pointer rounded-xl transition-all duration-300"
                 style={{
                   border: `2px solid ${colors.lightBlue}`,
@@ -704,7 +704,7 @@ const LandingPage: React.FC = () => {
               <span style={{ color: colors.primary }}>Sui</span><span style={{ color: colors.white }}>Verify</span>
             </h3>
             <p className="text-center flex-1 text-gray-500">All rights reserved</p>
-            <a href="https://kiran-4.gitbook.io/suiverify/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:opacity-80" style={{ color: colors.lightBlue }}>Docs</a>
+            <a href="https://suiverify.gitbook.io/suiverify/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:opacity-80" style={{ color: colors.lightBlue }}>Docs</a>
           </div>
         </div>
       </footer>

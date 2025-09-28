@@ -345,12 +345,12 @@ function GovernmentDecryptionPage() {
                 disabled={loading || !currentAccount?.address}
                 className={`px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2 ${
                   loading || !currentAccount?.address
-                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    ? 'text-gray-200 cursor-not-allowed'
                     : 'text-white'
                 }`}
                 style={{
                   background: loading || !currentAccount?.address 
-                    ? 'transparent' 
+                    ? '#9ca3af' 
                     : colors.gradients.primary
                 }}
               >
@@ -426,12 +426,12 @@ function GovernmentDecryptionPage() {
                 disabled={!selectedDocuments.length || !currentAccount?.address || isDecrypting}
                 className={`px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2 ${
                   !selectedDocuments.length || !currentAccount?.address || isDecrypting
-                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    ? 'text-gray-200 cursor-not-allowed'
                     : 'text-white'
                 }`}
                 style={{
                   background: !selectedDocuments.length || !currentAccount?.address || isDecrypting
-                    ? 'transparent'
+                    ? '#9ca3af'
                     : colors.gradients.primary
                 }}
               >

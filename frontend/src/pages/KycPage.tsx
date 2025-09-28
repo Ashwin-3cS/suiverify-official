@@ -548,12 +548,12 @@ function KycPage() {
                     whileTap={{ scale: 0.98 }}
                     className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-300 ${
                       isClaimingNft || !encryptionResult?.blobId
-                        ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                        ? 'text-gray-300 cursor-not-allowed'
                         : 'text-white shadow-lg'
                     }`}
                     style={{
                       background: isClaimingNft || !encryptionResult?.blobId 
-                        ? 'transparent' 
+                        ? '#4b5563' 
                         : colors.gradients.primary
                     }}
                   >
