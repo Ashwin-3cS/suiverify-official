@@ -39,16 +39,30 @@ echo "Testing hosts file redirection:"
 nslookup 10.0.0.200 || echo "nslookup not available"
 ping -c 1 10.0.0.200 || echo "ping test completed"
 
-# Get a json blob with key/value pair for secrets
-echo "Waiting for secrets via VSOCK..."
-JSON_RESPONSE=$(socat - VSOCK-LISTEN:7777,reuseaddr)
-echo "Secrets received successfully"
-# Sets all key value pairs as env variables that will be referred by the server
-# This is shown as a example below. For production usecases, it's best to set the
-# keys explicitly rather than dynamically.
-echo "$JSON_RESPONSE" | jq -r 'to_entries[] | "\(.key)=\(.value)"' > /tmp/kvpairs ; while IFS="=" read -r key value; do export "$key"="$value"; done < /tmp/kvpairs ; rm -f /tmp/kvpairs
+# Load environment variables from .env files only (no secrets.json)
+echo "Loading environment variables from .env files..."
 
-echo "Environment variables configured successfully"
+# Load Rust service environment variables
+if [ -f "/attestation_server.env" ]; then
+    echo "Loading Rust service environment from attestation_server.env"
+    set -a  # automatically export all variables
+    source /attestation_server.env
+    set +a  # stop automatically exporting
+else
+    echo "No attestation_server.env found, using defaults"
+fi
+
+# Load Python service environment variables
+if [ -f "/verification-backend.env" ]; then
+    echo "Loading Python service environment from verification-backend.env"
+    set -a  # automatically export all variables
+    source /verification-backend.env
+    set +a  # stop automatically exporting
+else
+    echo "No verification-backend.env found, using defaults"
+fi
+
+echo "Environment variables configured from .env files"
 
 # Run traffic forwarder in background and start the server
 # Forwards traffic from 127.0.0.x -> Port 443 at CID 3 Listening on port 800x

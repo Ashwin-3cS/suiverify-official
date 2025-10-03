@@ -138,9 +138,12 @@ impl RedisSuiProcessor {
     const REPORT_INTERVAL_SECS: u64 = 10;
 
     pub fn new(keypair: Ed25519KeyPair) -> Result<Self> {
-        // Redis configuration from environment variables
+        // Redis configuration from .env files (no secrets.json)
+        // Priority: .env file values > defaults (no external secrets)
         let redis_url = std::env::var("REDIS_URL")
             .unwrap_or_else(|_| "redis://localhost:6379".to_string());
+        
+        info!("Redis configuration source: .env files only (no secrets.json)");
         
         info!("Redis URL from environment: {}", 
               if redis_url.contains("redis-cloud.com") { 

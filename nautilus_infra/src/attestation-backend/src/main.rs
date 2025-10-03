@@ -30,7 +30,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
     
     // Debug: Log key environment variables (without sensitive data)
-    info!("Environment variables loaded:");
+    info!("Environment variables loaded (.env files only, no secrets.json):");
     info!("  REDIS_URL: {}", if std::env::var("REDIS_URL").is_ok() { "✅ Set" } else { "❌ Not set" });
     info!("  REDIS_STREAM_NAME: {}", std::env::var("REDIS_STREAM_NAME").unwrap_or("default".to_string()));
     info!("  SUI_PACKAGE_ID: {}", if std::env::var("SUI_PACKAGE_ID").is_ok() { "✅ Set" } else { "❌ Using default" });

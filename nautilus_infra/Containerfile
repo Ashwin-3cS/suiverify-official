@@ -110,8 +110,12 @@ RUN cp /src/attestation_server/allowed_endpoints.yaml initramfs/
 # Copy Python verification service
 COPY verification-backend/ initramfs/verification-backend/
 
-# Copy environment configuration if it exists, otherwise create empty one
-RUN cp /src/attestation_server/.env initramfs/attestation_server.env || echo "# Empty env file" > initramfs/attestation_server.env
+# Copy environment configuration files (.env only approach)
+# Note: Environment variable precedence in container:
+# 1. .env files - HIGHEST priority
+# 2. Default values in code - LOWEST priority
+RUN cp /src/attestation_server/.env initramfs/attestation_server.env 2>/dev/null || echo "# Rust service env file" > initramfs/attestation_server.env
+RUN cp /verification-backend/.env initramfs/verification-backend.env 2>/dev/null || echo "# Python service env file" > initramfs/verification-backend.env
 
 # Copy Python dependencies from the separate build stage
 RUN mkdir -p initramfs/usr/local/lib/python3.11/site-packages
