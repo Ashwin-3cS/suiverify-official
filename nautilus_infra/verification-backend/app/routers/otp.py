@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Form
 from app.models.schemas import APIResponse, OTPRequest, OTPVerification
 from app.services.otp_service import get_otp_service, OTPService
 from app.services.user_service import get_user_service, UserService
-from app.services.kafka_service import get_kafka_service, KafkaService
+from app.services.redis_service import get_redis_service, RedisService
 from app.models.user import VerificationLog, UserUpdate
 import logging
 
@@ -84,7 +84,7 @@ async def verify_otp(
     wallet_address: str = Form(...),  # Wallet address from frontend
     otp_service: OTPService = Depends(get_otp_service),
     user_service: UserService = Depends(get_user_service),
-    kafka_service: KafkaService = Depends(get_kafka_service)
+    redis_service: RedisService = Depends(get_redis_service)
 ):
     """
     Verify OTP and update user verification status
@@ -162,10 +162,10 @@ async def verify_otp(
         
         logger.info(f"User verification completed successfully")
         
-        # Send verification data to Kafka after successful verification
-        kafka_sent = False
+        # Send verification data to Redis after successful verification
+        redis_sent = False
         try:
-            kafka_data = {
+            redis_data = {
                 'wallet_address': updated_user.wallet_address,
                 'did': updated_user.did,
                 'is_verified': updated_user.is_verified,
@@ -174,15 +174,15 @@ async def verify_otp(
                 'phone_number': updated_user.phone_number
             }
             
-            kafka_sent = await kafka_service.send_verification_data(kafka_data)
-            if kafka_sent:
-                logger.info(f"Verification data sent to Kafka successfully for user: {updated_user.wallet_address}")
+            redis_sent = await redis_service.send_verification_data(redis_data)
+            if redis_sent:
+                logger.info(f"Verification data sent to Redis successfully for user: {updated_user.wallet_address}")
             else:
-                logger.warning(f"Failed to send verification data to Kafka for user: {updated_user.wallet_address}")
+                logger.warning(f"Failed to send verification data to Redis for user: {updated_user.wallet_address}")
                 
-        except Exception as kafka_error:
-            logger.error(f"Kafka error (non-blocking): {kafka_error}")
-            # Don't fail the API response if Kafka fails
+        except Exception as redis_error:
+            logger.error(f"Redis error (non-blocking): {redis_error}")
+            # Don't fail the API response if Redis fails
         
         return APIResponse(
             success=True,
@@ -193,7 +193,7 @@ async def verify_otp(
                 'verification_status': 'FULLY_VERIFIED',
                 'otp_verified': True,
                 'user_verified': True,
-                'kafka_sent': kafka_sent,
+                'redis_sent': redis_sent,
                 'user_data': {
                     'wallet_address': updated_user.wallet_address,
                     'phone_number': updated_user.phone_number,

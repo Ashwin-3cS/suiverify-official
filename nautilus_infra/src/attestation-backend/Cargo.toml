@@ -6,8 +6,8 @@ edition = "2021"
 [workspace]
 
 [dependencies]
-# Kafka - use pure Rust implementation to avoid all C/build issues
-rskafka = { version = "0.5", default-features = false }
+# Redis for message queuing (replacing Kafka)
+redis = { version = "0.24", features = ["tokio-comp", "streams"] }
 
 # Core dependencies
 tokio = { version = "1.25", features = ["macros", "rt-multi-thread", "net", "time"] }

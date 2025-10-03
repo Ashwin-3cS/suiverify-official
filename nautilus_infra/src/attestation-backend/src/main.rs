@@ -10,8 +10,8 @@ use std::sync::Arc;
 // CORS imports moved to function scope
 use tracing::{info, error};
 
-mod kafka_sui_processor;
-use kafka_sui_processor::start_kafka_sui_processor;
+mod redis_sui_processor;
+use redis_sui_processor::start_redis_sui_processor;
 // use rand::SeedableRng;
 
 #[tokio::main]
@@ -60,15 +60,15 @@ async fn main() -> Result<()> {
         Ed25519KeyPair::generate(&mut rand::thread_rng())
     };
 
-    // Clone the keypair for the Kafka processor
-    let kafka_keypair = Ed25519KeyPair::from_bytes(eph_kp.as_bytes())?;
+    // Clone the keypair for the Redis processor
+    let redis_keypair = Ed25519KeyPair::from_bytes(eph_kp.as_bytes())?;
     let state = Arc::new(AppState { eph_kp });
 
-    info!("Starting attestation server with API and Kafka processor");
+    info!("Starting attestation server with API and Redis processor");
 
-    // Start both API server and Kafka processor concurrently
+    // Start both API server and Redis processor concurrently
     let api_handle = tokio::spawn(run_api_server(state));
-    let kafka_handle = tokio::spawn(start_kafka_sui_processor(kafka_keypair));
+    let redis_handle = tokio::spawn(start_redis_sui_processor(redis_keypair));
 
     // Wait for either to complete (or fail)
     tokio::select! {
@@ -79,11 +79,11 @@ async fn main() -> Result<()> {
                 Err(e) => error!("API server task panicked: {}", e),
             }
         }
-        result = kafka_handle => {
+        result = redis_handle => {
             match result {
-                Ok(Ok(())) => info!("Kafka processor completed successfully"),
-                Ok(Err(e)) => error!("Kafka processor failed: {}", e),
-                Err(e) => error!("Kafka processor task panicked: {}", e),
+                Ok(Ok(())) => info!("Redis processor completed successfully"),
+                Ok(Err(e)) => error!("Redis processor failed: {}", e),
+                Err(e) => error!("Redis processor task panicked: {}", e),
             }
         }
     }

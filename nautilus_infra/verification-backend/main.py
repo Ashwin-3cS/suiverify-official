@@ -19,7 +19,7 @@ from app.services.face_recognition_service import get_face_recognition_service
 from app.services.otp_service import OTPService
 from app.services.user_service import get_user_service
 from app.services.encryption_service import encryption_service
-from app.services.kafka_service import get_kafka_service
+from app.services.redis_service import get_redis_service
 from app.database import connect_to_mongo, close_mongo_connection
 
 # Configure logging
@@ -50,38 +50,34 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Failed to connect to MongoDB: {e}")
         raise
-    
     # Initialize services
     ocr_service = OCRService()
     face_recognition_service = get_face_recognition_service()
     otp_service = OTPService()
     
-    # Test Kafka connection
-    kafka_service = get_kafka_service()
+    # Test Redis connection
+    redis_service = get_redis_service()
     try:
-        kafka_health = await kafka_service.health_check()
-        if kafka_health['connected']:
-            logger.info(f"✅ Kafka connected successfully to {kafka_health['server']}")
+        redis_health = await redis_service.health_check()
+        if redis_health['connected']:
+            logger.info(f"✅ Redis connected successfully to {redis_health['host']}:{redis_health['port']}")
         else:
-            logger.warning(f"⚠️ Kafka connection failed: {kafka_health['error']}")
-            logger.warning("Application will continue without Kafka (messages will be logged)")
+            logger.warning(f"⚠️ Redis connection failed: {redis_health.get('error', 'Unknown error')}")
     except Exception as e:
-        logger.warning(f"⚠️ Kafka health check failed: {e}")
-        logger.warning("Application will continue without Kafka (messages will be logged)")
+        logger.warning(f"⚠️ Redis connection test failed: {e}")
     
     logger.info("All services initialized successfully")
-    
     yield
     
     # Cleanup
     logger.info("Shutting down SuiVerify System...")
     await close_mongo_connection()
     
-    # Close Kafka service
+    # Close Redis service
     try:
-        await kafka_service.close()
+        await redis_service.close()
     except Exception as e:
-        logger.warning(f"Error closing Kafka service: {e}")
+        logger.warning(f"Error closing Redis service: {e}")
 
 # Create FastAPI app
 app = FastAPI(
@@ -112,9 +108,9 @@ app.include_router(credentials.router, prefix="/api", tags=["Credentials Managem
 @app.get("/")
 async def root():
     """Health check endpoint"""
-    # Get Kafka status
-    kafka_service = get_kafka_service()
-    kafka_status = "connected" if kafka_service.is_connected else "disconnected"
+    # Get Redis status
+    redis_service = get_redis_service()
+    redis_status = "connected" if redis_service.is_connected else "disconnected"
     
     return {
         "message": "SuiVerify API - Identity Verification System",
@@ -127,7 +123,7 @@ async def root():
             "face_recognition": "ready", 
             "otp": "ready",
             "encryption_metadata": "ready",
-            "kafka": kafka_status
+            "redis": redis_status
         }
     }
 
