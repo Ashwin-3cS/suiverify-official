@@ -3,31 +3,38 @@
 
 import json
 import hashlib
+import os
 from datetime import datetime
 from typing import Optional
 import logging
 import redis
-from redis.exceptions import ConnectionError, TimeoutError, RedisError
 
 logger = logging.getLogger(__name__)
 
 class RedisService:
     def __init__(self):
-        # Redis Cloud credentials (hardcoded for now)
+        # Redis configuration from environment variables
+        self.redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+        self.redis_host = os.getenv('REDIS_HOST', 'localhost')
+        self.redis_port = int(os.getenv('REDIS_PORT', '6379'))
+        self.redis_password = os.getenv('REDIS_PASSWORD', '')
+        self.redis_username = os.getenv('REDIS_USERNAME', 'default')
+        self.stream_name = os.getenv('REDIS_STREAM_NAME', 'verification_stream')
+        
+        # Redis connection configuration
         self.redis_config = {
-            'host': 'redis-18401.c261.us-east-1-4.ec2.redns.redis-cloud.com',
-            'port': 18401,
-            'decode_responses': True,
-            'username': 'default',
-            'password': '8GYkgUdA0XwfqNbdMg5hl6oc1f9wUpH0',
-            'socket_timeout': 5,
-            'socket_connect_timeout': 5,
+            'host': self.redis_host,
+            'port': self.redis_port,
+            'password': self.redis_password if self.redis_password else None,
+            'username': self.redis_username if self.redis_username != 'default' else None,
+            'decode_responses': False,  # Keep as bytes for stream compatibility
+            'socket_timeout': 30,
+            'socket_connect_timeout': 30,
             'retry_on_timeout': True,
             'health_check_interval': 30
         }
         
         # Redis stream configuration
-        self.stream_name = 'verification_stream'
         self.max_stream_length = 10000  # Keep last 10k messages
         
         # Connection status
@@ -39,8 +46,8 @@ class RedisService:
         
         # Log configuration on initialization
         logger.info(f"Redis Service initialized with:")
-        logger.info(f"  Host: {self.redis_config['host']}")
-        logger.info(f"  Port: {self.redis_config['port']}")
+        logger.info(f"  Host: {self.redis_host}")
+        logger.info(f"  Port: {self.redis_port}")
         logger.info(f"  Stream: {self.stream_name}")
     
     def _get_redis_client(self) -> redis.Redis:

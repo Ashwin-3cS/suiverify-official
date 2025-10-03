@@ -16,11 +16,24 @@ use redis_sui_processor::start_redis_sui_processor;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // Load environment variables from .env file
+    // Load environment variables from local .env file first
     dotenvy::dotenv().ok();
+    
+    // Log which env file is being used
+    if std::path::Path::new(".env").exists() {
+        info!("Loading environment variables from attestation-backend/.env");
+    } else {
+        info!("No local .env file found, using system environment variables");
+    }
     
     // Initialize tracing
     tracing_subscriber::fmt::init();
+    
+    // Debug: Log key environment variables (without sensitive data)
+    info!("Environment variables loaded:");
+    info!("  REDIS_URL: {}", if std::env::var("REDIS_URL").is_ok() { "✅ Set" } else { "❌ Not set" });
+    info!("  REDIS_STREAM_NAME: {}", std::env::var("REDIS_STREAM_NAME").unwrap_or("default".to_string()));
+    info!("  SUI_PACKAGE_ID: {}", if std::env::var("SUI_PACKAGE_ID").is_ok() { "✅ Set" } else { "❌ Using default" });
 
     
 

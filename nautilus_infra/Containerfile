@@ -81,13 +81,13 @@ RUN cargo build --workspace --locked --no-default-features --release --target x8
 
 WORKDIR /src/attestation_server
 
-# Clean environment - no cmake/rdkafka environment variables needed
+# Clean environment - Redis-based build (no Kafka dependencies)
 ENV RUSTFLAGS="-C target-feature=+crt-static -C relocation-model=static"
 
-# Remove old Cargo.lock to allow fresh dependency resolution with rskafka
+# Remove old Cargo.lock to allow fresh dependency resolution with Redis
 RUN rm -f Cargo.lock
 
-# Build with rskafka (pure Rust) - no cmake/C dependencies
+# Build with Redis (pure Rust) - no cmake/C dependencies
 RUN cargo build --no-default-features --features aws --release --target x86_64-unknown-linux-musl
 
 WORKDIR /build_cpio

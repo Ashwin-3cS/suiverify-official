@@ -29,8 +29,9 @@ run: out/nitro.eif
 		--memory 26624 \
 		--eif-path out/nitro.eif
 	@echo "Enclave running with integrated services:"
-	@echo "  - Rust verification-server (internal port 4000)"
-	@echo "  - Python verification service (main port 8000)"
+	@echo "  - Rust attestation-server with Redis consumer (internal port 4000)"
+	@echo "  - Python verification service with Redis producer (main port 8000)"
+	@echo "  - Redis Cloud integration for message queuing"
 	@echo "  - Access via: vsock-proxy 8000 localhost 8000"
 
 .PHONY: run-debug
@@ -47,17 +48,18 @@ run-debug: out/nitro.eif
 run-local:
 	@echo "Running services locally for development..."
 	cd ../verification-backend && python3 main.py &
-	cd src/verification-server && cargo run &
+	cd src/attestation-backend && cargo run &
 	@echo "Services started:"
-	@echo "  - Python service: http://localhost:8000"
-	@echo "  - Rust service: http://localhost:4000"
+	@echo "  - Python verification service with Redis producer: http://localhost:8000"
+	@echo "  - Rust attestation service with Redis consumer: http://localhost:4000"
+	@echo "  - Redis Cloud integration active"
 	@echo "Use 'make stop-local' to stop services"
 
 .PHONY: stop-local
 stop-local:
 	@echo "Stopping local services..."
 	pkill -f "python3 main.py" || true
-	pkill -f "verification-server" || true
+	pkill -f "attestation_server" || true
 	@echo "Local services stopped"
 
 .PHONY: update
@@ -87,4 +89,4 @@ status:
 	@echo "=== ENCLAVE STATUS ==="
 	sudo nitro-cli describe-enclaves || echo "No enclaves running"
 	@echo "=== LOCAL SERVICES STATUS ==="
-	ps aux | grep -E "(python3 main.py|verification-server)" | grep -v grep || echo "No local services running"
+	ps aux | grep -E "(python3 main.py|attestation_server)" | grep -v grep || echo "No local services running"

@@ -58,25 +58,9 @@ echo "Environment variables configured successfully"
 # Traffic-forwarder-block
 # External API forwarders configured for auction validation services
 
-# Forward external service - listen on the service IP address (static - matching secrets.json)
-echo "Starting external service traffic forwarder"
-socat TCP4-LISTEN:9092,bind=10.0.0.200,reuseaddr,fork VSOCK-CONNECT:3:9092 &
-SERVICE_FORWARDER_PID=$!
-
-# Also add iptables rule to redirect any traffic to service IP:9092 to localhost:9092
-echo "Adding iptables redirect for external service"
-iptables -t nat -A OUTPUT -d 10.0.0.200 -p tcp --dport 9092 -j REDIRECT --to-port 9092 || echo "iptables not available or failed"
-
-# Give forwarders time to start
-sleep 2
-
-# Test if service forwarder is actually listening on port 9092...
-echo "Testing if service forwarder is listening on port 9092..."
-netstat -ln | grep :9092 || echo "Port 9092 not listening"
-
-# Test VSOCK connection
-echo "Testing VSOCK connection to parent..."
-timeout 3 socat - VSOCK-CONNECT:3:9092 < /dev/null || echo "VSOCK connection to parent failed"
+# Redis service is external (Redis Cloud) - no local forwarding needed
+echo "Redis service configured to use external Redis Cloud"
+echo "No local Redis forwarding required"
 
 # Listens on Local VSOCK Port 8000 (Python service) and forwards to localhost 8000
 socat VSOCK-LISTEN:8000,reuseaddr,fork TCP:localhost:8000 &

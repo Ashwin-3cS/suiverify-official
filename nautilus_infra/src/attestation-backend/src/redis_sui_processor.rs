@@ -138,23 +138,38 @@ impl RedisSuiProcessor {
     const REPORT_INTERVAL_SECS: u64 = 10;
 
     pub fn new(keypair: Ed25519KeyPair) -> Result<Self> {
-        // Redis Cloud credentials (hardcoded for now)
-        let redis_url = "redis://default:8GYkgUdA0XwfqNbdMg5hl6oc1f9wUpH0@redis-18401.c261.us-east-1-4.ec2.redns.redis-cloud.com:18401";
+        // Redis configuration from environment variables
+        let redis_url = std::env::var("REDIS_URL")
+            .unwrap_or_else(|_| "redis://localhost:6379".to_string());
         
-        let client = Client::open(redis_url)
+        info!("Redis URL from environment: {}", 
+              if redis_url.contains("redis-cloud.com") { 
+                  "Redis Cloud (credentials hidden)" 
+              } else { 
+                  &redis_url 
+              });
+        
+        let client = Client::open(redis_url.as_str())
             .map_err(|e| anyhow!("Failed to create Redis client: {}", e))?;
 
         Ok(RedisSuiProcessor {
             keypair,
             redis_client: client,
-            stream_name: "verification_stream".to_string(),
-            consumer_group: "attestation_processors".to_string(),
-            consumer_name: "rust_processor_1".to_string(),
+            stream_name: std::env::var("REDIS_STREAM_NAME")
+                .unwrap_or_else(|_| "verification_stream".to_string()),
+            consumer_group: std::env::var("REDIS_CONSUMER_GROUP")
+                .unwrap_or_else(|_| "attestation_processors".to_string()),
+            consumer_name: std::env::var("REDIS_CONSUMER_NAME")
+                .unwrap_or_else(|_| "rust_processor_1".to_string()),
             throughput_tracker: ThroughputTracker::new(),
-            package_id: "0x3611276dabf733007d7975e17989e505eb93e11f4998f93d5c74c3a44231833d".to_string(),
-            registry_id: "0xea43902e5184fc2cbbc194e63c236321d7cd4aebd006b2d4a7c76f8f03f194b9".to_string(),
-            cap_id: "0x678a8ad11edf87246cafad705bed96960990b8d94c7708a0dce4ba68bfeec13a".to_string(),
-            clock_id: "0x0000000000000000000000000000000000000000000000000000000000000006".to_string(),
+            package_id: std::env::var("SUI_PACKAGE_ID")
+                .unwrap_or_else(|_| "0x3611276dabf733007d7975e17989e505eb93e11f4998f93d5c74c3a44231833d".to_string()),
+            registry_id: std::env::var("SUI_REGISTRY_ID")
+                .unwrap_or_else(|_| "0xea43902e5184fc2cbbc194e63c236321d7cd4aebd006b2d4a7c76f8f03f194b9".to_string()),
+            cap_id: std::env::var("SUI_CAP_ID")
+                .unwrap_or_else(|_| "0x678a8ad11edf87246cafad705bed96960990b8d94c7708a0dce4ba68bfeec13a".to_string()),
+            clock_id: std::env::var("SUI_CLOCK_ID")
+                .unwrap_or_else(|_| "0x0000000000000000000000000000000000000000000000000000000000000006".to_string()),
         })
     }
 
