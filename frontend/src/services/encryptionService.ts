@@ -11,6 +11,8 @@ const NUM_EPOCH = 1;
 const SUI_CLIENT = new SuiClient({ url: 'https://fullnode.testnet.sui.io:443' });
 const PACKAGE_ID = '0xcfedf4e2445497ba1a5d57349d6fc116b194eca41524f46f593c63a7a70a8eab';
 
+
+const API_BASE_URL = "http://localhost:8000/api";
 // Government whitelist ID (should match the deployed whitelist)
 const GOVERNMENT_WHITELIST_ID = '0xca700b2604763639ba3fbf0237d4f1ab34470ac509d407d34030621b1a254747';
 
@@ -182,13 +184,12 @@ export class DocumentEncryptionService {
 
   // Helper method to get the aggregator URL for a blob
   static getBlobUrl(blobId: string): string {
-    return `${WALRUS_AGGREGATOR_URL}/v1/blobs/${blobId}`;
   }
 
   // Store encryption metadata in backend database
   private async storeEncryptionMetadata(metadata: EncryptionMetadataPayload): Promise<void> {
     try {
-      const response = await fetch('http://localhost:8000/api/encryption/store', {
+      const response = await fetch(`${API_BASE_URL}/encryption/store`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

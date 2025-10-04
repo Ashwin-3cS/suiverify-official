@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ChevronLeft, Upload, FileText, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { colors } from '../brand';
+import { useCurrentAccount } from '@mysten/dapp-kit';
 
 interface AadhaarData {
   name?: string;
@@ -19,11 +20,12 @@ interface AadhaarUploadStepProps {
 }
 
 const AadhaarUploadStep: React.FC<AadhaarUploadStepProps> = ({ onNext, onBack, onFileUpload }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [aadhaarData, setAadhaarData] = useState<AadhaarData | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const currentAccount = useCurrentAccount();
 
   const API_BASE = 'http://localhost:8000';
 
@@ -44,7 +46,7 @@ const AadhaarUploadStep: React.FC<AadhaarUploadStepProps> = ({ onNext, onBack, o
     } catch (err) {
       console.error('API call failed:', err);
       if (err instanceof TypeError && err.message.includes('fetch')) {
-        throw new Error('Network error: Please ensure the backend server is running on localhost:8000');
+        throw new Error('Network error: Please ensure the backend server is running on localhost:8000 (via SSH tunnel)');
       }
       throw err;
     }
@@ -57,6 +59,11 @@ const AadhaarUploadStep: React.FC<AadhaarUploadStepProps> = ({ onNext, onBack, o
     try {
       const formData = new FormData();
       formData.append('file', file);
+      
+      // Add wallet address if connected
+      if (currentAccount?.address) {
+        formData.append('wallet_address', currentAccount.address);
+      }
       
       const result = await handleApiCall('/api/aadhaar/extract-aadhaar-data', formData);
       

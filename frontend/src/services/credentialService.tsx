@@ -22,8 +22,10 @@ export interface CredentialData {
     pending: number;
   }
   
+import { config } from '../config/environment';
+
   class CredentialService {
-    private baseUrl = 'http://localhost:8000/api';
+    private baseUrl = config.VERIFICATION_API_URL;
   
     /**
      * Fetch user credentials from backend

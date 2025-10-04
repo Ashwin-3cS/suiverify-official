@@ -29,7 +29,6 @@ const OtpVerificationStep: React.FC<OtpVerificationStepProps> = ({ onNext, onBac
   const [error, setError] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(false);
   const currentAccount = useCurrentAccount();
-
   // Auto-set DID based on verification type
   const getDid = () => {
     return verificationType === 'above18' ? 0 : 1;
@@ -41,7 +40,10 @@ const OtpVerificationStep: React.FC<OtpVerificationStepProps> = ({ onNext, onBac
     try {
       const response = await fetch(`${API_BASE}${url}`, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(formData).toString(),
       });
 
       const result = await response.json();
@@ -54,12 +56,11 @@ const OtpVerificationStep: React.FC<OtpVerificationStepProps> = ({ onNext, onBac
     } catch (err) {
       console.error('API call failed:', err);
       if (err instanceof TypeError && err.message.includes('fetch')) {
-        throw new Error('Network error: Please ensure the backend server is running on localhost:8000');
+        throw new Error('Network error: Please ensure the backend server is running on localhost:8000 (via SSH tunnel)');
       }
       throw err;
     }
   };
-
   const generateOtp = async () => {
     setIsLoading(true);
     setError(null);

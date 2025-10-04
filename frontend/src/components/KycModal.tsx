@@ -86,7 +86,7 @@ const KycModal: React.FC<KycModalProps> = ({ isOpen, onClose, verificationType }
       return await response.json();
     } catch (err) {
       console.error('API call failed:', err);
-      throw new Error('Network error: Please ensure the backend server is running on localhost:8000');
+      throw new Error('Network error: Please ensure the backend server is running on localhost:8000 (via SSH tunnel)');
     }
   };
 

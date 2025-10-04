@@ -561,7 +561,7 @@ function KycPage() {
                   </motion.button>
                   
                   <motion.button
-                    onClick={() => navigate('/user')}
+                    onClick={() => navigate('/dashboard')}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="w-full py-3 px-6 rounded-xl font-medium transition-all duration-300 text-white"
