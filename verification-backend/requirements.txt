@@ -30,3 +30,6 @@ redis==5.0.0
 
 # Typing extensions for Python 3.8 compatibility
 typing_extensions>=4.0.0
+
+# Fix for OpenSSL 1.0.2k compatibility
+urllib3<2.0.0
