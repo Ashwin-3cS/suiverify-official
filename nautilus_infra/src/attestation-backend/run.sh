@@ -36,6 +36,10 @@ echo "127.0.0.1 10.0.0.200" >> /etc/hosts
 # Add host entry for VSOCK CID 3 (parent) - for Sui proxy communication
 echo "127.0.0.1 3" >> /etc/hosts
 
+# Add DNS configuration for external services
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo "nameserver 1.1.1.1" >> /etc/resolv.conf
+
 echo "Updated /etc/hosts file:"
 cat /etc/hosts
 
