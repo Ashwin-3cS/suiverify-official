@@ -30,6 +30,8 @@ WORKDIR /deps
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    make \
+    cmake \
     pkg-config \
     libhdf5-dev \
     libgl1-mesa-dri \
@@ -42,8 +44,8 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev
 
 COPY verification-backend/requirements.txt .
-# Install with proper architecture and rebuild binary extensions
-RUN pip install --no-cache-dir --target=packages --force-reinstall --no-binary=:all: -r requirements.txt
+# Install with pre-built wheels when possible, only compile when necessary
+RUN pip install --no-cache-dir --target=packages -r requirements.txt
 
 FROM scratch as base
 ENV TARGET=x86_64-unknown-linux-musl
