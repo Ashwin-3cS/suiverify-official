@@ -35,24 +35,20 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-dri \
     libglib2.0-0 \
     libsm6 \
-    libxext6 \
     libxrender-dev \
     libgomp1 \
     libgthread-2.0-0 \
     libglu1-mesa \
-    zlib1g-dev \
-    libz-dev \
-    && rm -rf /var/lib/apt/lists/*
+    zlib1g-dev
 
-# Copy requirements and install packages
 COPY verification-backend/requirements.txt .
-RUN pip install --no-cache-dir --target /deps/packages -r requirements.txt
+# Install with proper architecture and rebuild binary extensions
+RUN pip install --no-cache-dir --target=packages --force-reinstall --no-binary=:all: -r requirements.txt
 
 FROM scratch as base
 ENV TARGET=x86_64-unknown-linux-musl
 ENV RUSTFLAGS="-C target-feature=+crt-static"
 ENV CARGOFLAGS="--locked --no-default-features --release --target ${TARGET}"
-ENV OPENSSL_STATIC=true
 
 COPY --from=core-busybox . /
 COPY --from=core-musl . /

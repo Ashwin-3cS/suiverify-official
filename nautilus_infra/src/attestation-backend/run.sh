@@ -33,6 +33,9 @@ echo "127.0.0.1   localhost" > /etc/hosts
 # Redirect external service address to localhost to force traffic through forwarder
 echo "127.0.0.1 10.0.0.200" >> /etc/hosts
 
+# Add host entry for VSOCK CID 3 (parent) - for Sui proxy communication
+echo "127.0.0.1 3" >> /etc/hosts
+
 echo "Updated /etc/hosts file:"
 cat /etc/hosts
 
@@ -83,6 +86,9 @@ socat VSOCK-LISTEN:8000,reuseaddr,fork TCP:localhost:8000 &
 
 # Listens on Local VSOCK Port 4000 (Rust service) and forwards to localhost 4000
 socat VSOCK-LISTEN:4000,reuseaddr,fork TCP:localhost:4000 &
+
+# Forward HTTP requests to CID 3 (parent) for Sui proxy communication
+socat TCP-LISTEN:9999,reuseaddr,fork VSOCK-CONNECT:3:9999 &
 
 # Set Python path for verification-backend
 export PYTHONPATH="/usr/local/lib/python3.11/site-packages:$PYTHONPATH"
