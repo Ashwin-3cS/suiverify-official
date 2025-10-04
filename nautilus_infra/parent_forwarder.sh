@@ -16,6 +16,12 @@ echo "Setting up VSOCK forwarding for Sui proxy..."
 SUI_VSOCK_PID=$!
 echo "Sui VSOCK forwarder started with PID: $SUI_VSOCK_PID"
 
+# Forward VSOCK port 6379 to Redis Cloud
+echo "Setting up VSOCK forwarding for Redis Cloud..."
+/usr/local/bin/socat VSOCK-LISTEN:6379,fork TCP:redis-10161.c264.ap-south-1-1.ec2.redislabs.com:10161 &
+REDIS_VSOCK_PID=$!
+echo "Redis VSOCK forwarder started with PID: $REDIS_VSOCK_PID"
+
 # Forward VSOCK port 9092 to the IP (static - matching secrets.json)
 echo "Testing connection to IP first..."
 timeout 5 nc -z 3.9.67.15 9092

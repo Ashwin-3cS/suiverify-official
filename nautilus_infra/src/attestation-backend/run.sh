@@ -94,6 +94,9 @@ socat VSOCK-LISTEN:4000,reuseaddr,fork TCP:localhost:4000 &
 # Forward HTTP requests to CID 3 (parent) for Sui proxy communication
 socat TCP-LISTEN:9999,reuseaddr,fork VSOCK-CONNECT:3:9999 &
 
+# Forward Redis requests to CID 3 (parent) for Redis Cloud access
+socat TCP-LISTEN:6379,reuseaddr,fork VSOCK-CONNECT:3:6379 &
+
 # Set Python path for verification-backend
 export PYTHONPATH="/usr/local/lib/python3.11/site-packages:$PYTHONPATH"
 
