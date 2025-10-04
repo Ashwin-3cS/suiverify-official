@@ -2,7 +2,11 @@
 User model and schemas for MongoDB
 """
 from datetime import datetime
-from typing import Optional, Dict, Any, Annotated
+from typing import Optional, Dict, Any
+try:
+    from typing import Annotated
+except ImportError:
+    from typing_extensions import Annotated
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 from bson import ObjectId
 import re

@@ -27,3 +27,6 @@ httpx>=0.24.0,<1.0.0
 
 # Redis for message queuing (version 5.0.0 supports Redis 5.0 to 7.4)
 redis==5.0.0
+
+# Typing extensions for Python 3.8 compatibility
+typing_extensions>=4.0.0
