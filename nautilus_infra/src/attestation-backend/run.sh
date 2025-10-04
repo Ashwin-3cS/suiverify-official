@@ -74,7 +74,7 @@ fi
 echo "Environment variables configured from .env files"
 
 # Override Redis URL to use local forwarding instead of direct Redis Cloud access
-export REDIS_URL="redis://localhost:6379"
+export REDIS_URL="redis://default:8GYkgUdA0XwfqNbdMg5hl6oc1f9wUpH0@localhost:6379"
 echo "Redis URL overridden to use local forwarding: $REDIS_URL"
 
 # Run traffic forwarder in background and start the server
