@@ -103,11 +103,7 @@ COPY --from=core-ca-certificates /etc/ssl/certs initramfs/etc/ssl/certs/
 COPY --from=core-busybox /bin/sh initramfs/sh
 COPY --from=user-jq /bin/jq initramfs/
 COPY --from=user-socat /bin/socat initramfs/
-# Copy sui CLI binary and config (must be present in build context)
-COPY sui initramfs/sui
-RUN chmod +x initramfs/sui
-# Copy sui configuration directory
-COPY .sui/ initramfs/.sui/
+# Sui CLI calls will be made via host proxy - no need for CLI in container
 RUN cp /target/${TARGET}/release/init initramfs/
 RUN cp /src/attestation-backend/target/${TARGET}/release/attestation_server initramfs/
 RUN cp /src/attestation-backend/run.sh initramfs/

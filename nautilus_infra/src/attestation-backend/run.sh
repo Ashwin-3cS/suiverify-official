@@ -13,7 +13,6 @@
 # - Launches nautilus-server
 
 set -e # Exit immediately if a command exits with a non-zero status
-echo "=== DEBUG: run.sh script is running ==="
 echo "Current directory: $(pwd)"
 echo "Available files in root:"
 ls -la / | head -10
@@ -42,10 +41,6 @@ echo "Testing hosts file redirection:"
 nslookup 10.0.0.200 || echo "nslookup not available"
 ping -c 1 10.0.0.200 || echo "ping test completed"
 
-# Set up environment for sui CLI
-export HOME=/
-export PATH="/bin:/sbin:/usr/bin:/usr/sbin:/"
-
 # Load environment variables from .env files only (no secrets.json)
 echo "Loading environment variables from .env files..."
 
@@ -70,18 +65,6 @@ else
 fi
 
 echo "Environment variables configured from .env files"
-
-# Debug: Check if sui CLI and config are available
-echo "Checking sui CLI setup..."
-ls -la /sui || echo "sui binary not found"
-ls -la /.sui/ || echo ".sui config directory not found"
-echo "Current HOME: $HOME"
-echo "Current PATH: $PATH"
-
-# TEMPORARY: Exit early for debugging
-echo "=== EARLY EXIT FOR DEBUGGING ==="
-echo "Exiting run.sh early to test boot process"
-exit 0
 
 # Run traffic forwarder in background and start the server
 # Forwards traffic from 127.0.0.x -> Port 443 at CID 3 Listening on port 800x

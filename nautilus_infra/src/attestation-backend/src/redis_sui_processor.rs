@@ -8,7 +8,8 @@ use fastcrypto::{ed25519::Ed25519KeyPair, traits::Signer};
 use chrono::DateTime;
 use hex;
 use base64::{Engine as _, engine::general_purpose};
-use std::process::Command;
+use reqwest;
+use serde_json;
 use std::collections::HashMap;
 
 // DID type constants (matching your Move contract)
@@ -186,8 +187,8 @@ impl RedisSuiProcessor {
         info!("   Consumer Group: {}", self.consumer_group);
         info!("   Consumer Name: {}", self.consumer_name);
         
-        // Test sui client configuration
-        self.test_sui_client().await?;
+        // Test sui client configuration (via host proxy)
+        self.test_sui_host_proxy().await?;
 
         // Test Redis connection
         self.test_redis_connection().await?;
@@ -433,32 +434,63 @@ impl RedisSuiProcessor {
         Ok(())
     }
 
-    async fn test_sui_client(&self) -> Result<()> {
-        info!("Testing sui client configuration...");
+    async fn test_sui_host_proxy(&self) -> Result<()> {
+        info!("Testing Sui host proxy connection...");
         
-        let output = Command::new("sui")
-            .args(["client", "active-address"])
-            .output()
-            .map_err(|e| anyhow!("Failed to execute sui client: {}", e))?;
-
-        if output.status.success() {
-            let active_address = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        let client = reqwest::Client::new();
+        
+        // Test health endpoint
+        let health_response = client
+            .get("http://3:9999/health")
+            .send()
+            .await
+            .map_err(|e| anyhow!("Failed to connect to Sui proxy: {}", e))?;
+        
+        if !health_response.status().is_success() {
+            return Err(anyhow!("Sui proxy health check failed"));
+        }
+        
+        info!("✅ Sui proxy health check passed");
+        
+        // Test active address
+        let address_response = client
+            .get("http://3:9999/sui/client/active-address")
+            .send()
+            .await
+            .map_err(|e| anyhow!("Failed to get active address: {}", e))?;
+        
+        let address_result: serde_json::Value = address_response
+            .json()
+            .await
+            .map_err(|e| anyhow!("Failed to parse address response: {}", e))?;
+        
+        if address_result["success"].as_bool().unwrap_or(false) {
+            let active_address = address_result["stdout"].as_str().unwrap_or("unknown");
             info!("Sui client active address: {}", active_address);
-            
-            // Test gas balance
-            let gas_output = Command::new("sui")
-                .args(["client", "gas"])
-                .output()
-                .map_err(|e| anyhow!("Failed to check gas: {}", e))?;
-                
-            if gas_output.status.success() {
-                info!("Gas coins available");
-                info!("Gas info: {}", String::from_utf8_lossy(&gas_output.stdout).lines().take(3).collect::<Vec<_>>().join(" | "));
-            } else {
-                warn!("Could not check gas coins: {}", String::from_utf8_lossy(&gas_output.stderr));
-            }
         } else {
-            return Err(anyhow!("Sui client not configured properly: {}", String::from_utf8_lossy(&output.stderr)));
+            let error = address_result["stderr"].as_str().unwrap_or("unknown error");
+            return Err(anyhow!("Sui client error: {}", error));
+        }
+        
+        // Test gas availability
+        let gas_response = client
+            .get("http://3:9999/sui/client/gas")
+            .send()
+            .await
+            .map_err(|e| anyhow!("Failed to get gas info: {}", e))?;
+        
+        let gas_result: serde_json::Value = gas_response
+            .json()
+            .await
+            .map_err(|e| anyhow!("Failed to parse gas response: {}", e))?;
+        
+        if gas_result["success"].as_bool().unwrap_or(false) {
+            info!("Gas coins available");
+            let gas_info = gas_result["stdout"].as_str().unwrap_or("");
+            info!("Gas info: {}", gas_info);
+        } else {
+            let error = gas_result["stderr"].as_str().unwrap_or("unknown error");
+            return Err(anyhow!("Sui client gas error: {}", error));
         }
         
         Ok(())
@@ -485,52 +517,64 @@ impl RedisSuiProcessor {
         
         info!("Mapping: Redis DID {} → Contract DID {}", redis_did_id, contract_did_type);
         
-        // Execute sui client call command for start_verification
-        let output = Command::new("sui")
-            .args([
-                "client",
-                "call",
-                "--package", &self.package_id,
-                "--module", "did_registry",
-                "--function", "start_verification",
-                "--args", 
-                &self.registry_id,              // registry
-                &self.cap_id,                   // cap
-                user_address,                   // user_address
-                &contract_did_type.to_string(), // did_type (contract value)
-                &self.clock_id,                 // clock
-                "--gas-budget", "10000000"
-            ])
-            .output()
-            .map_err(|e| anyhow!("Failed to execute sui command: {}", e))?;
+        // Execute sui client call via host proxy
+        let client = reqwest::Client::new();
+        let call_data = serde_json::json!({
+            "package_id": self.package_id,
+            "module": "did_registry",
+            "function": "start_verification",
+            "args": [
+                self.registry_id.clone(),              // registry
+                self.cap_id.clone(),                   // cap
+                user_address,                          // user_address
+                contract_did_type.to_string(),         // did_type (contract value)
+                self.clock_id.clone()                  // clock
+            ],
+            "gas_budget": "10000000"
+        });
+
+        let response = client
+            .post("http://3:9999/sui/client/call")
+            .json(&call_data)
+            .send()
+            .await
+            .map_err(|e| anyhow!("Failed to execute sui command via proxy: {}", e))?;
+
+        let result: serde_json::Value = response
+            .json()
+            .await
+            .map_err(|e| anyhow!("Failed to parse response: {}", e))?;
 
         // Process the output
-        if output.status.success() {
+        if result["success"].as_bool().unwrap_or(false) {
             info!("start_verification executed successfully for user: {}", user_address);
-            let output_str = String::from_utf8_lossy(&output.stdout);
+            let output_str = result["stdout"].as_str().unwrap_or("");
             info!("Output: {}", output_str);
             
             // Extract UserDID object ID from the transaction output
-            if let Some(user_did_id) = extract_user_did_id(&output_str) {
+            if let Some(user_did_id) = extract_user_did_id(output_str) {
                 info!("Extracted UserDID ID: {}", user_did_id);
                 return Ok(Some(user_did_id));
             } else {
                 warn!("Could not extract UserDID ID from transaction output");
             }
             
-            if !output.stderr.is_empty() {
-                warn!("Warnings: {}", String::from_utf8_lossy(&output.stderr));
+            let stderr = result["stderr"].as_str().unwrap_or("");
+            if !stderr.is_empty() {
+                warn!("Warnings: {}", stderr);
             }
         } else {
+            let stderr = result["stderr"].as_str().unwrap_or("unknown error");
+            let stdout = result["stdout"].as_str().unwrap_or("");
+            let returncode = result["returncode"].as_i64().unwrap_or(-1);
+            
             error!("start_verification failed for user: {}", user_address);
-            error!("Exit code: {}", output.status.code().unwrap_or(-1));
-            error!("STDERR: {}", String::from_utf8_lossy(&output.stderr));
-            error!("STDOUT: {}", String::from_utf8_lossy(&output.stdout));
+            error!("Exit code: {}", returncode);
+            error!("STDERR: {}", stderr);
+            error!("STDOUT: {}", stdout);
             
             return Err(anyhow!("Transaction execution failed with exit code: {} - STDERR: {} - STDOUT: {}", 
-                output.status.code().unwrap_or(-1),
-                String::from_utf8_lossy(&output.stderr),
-                String::from_utf8_lossy(&output.stdout)));
+                returncode, stderr, stdout));
         }
 
         Ok(None)
@@ -598,46 +642,59 @@ impl RedisSuiProcessor {
         
         info!("Processing address: {}", user_address);
         
-        // Execute sui client call command
-        let output = Command::new("sui")
-            .args([
-                "client",
-                "call",
-                "--package", &self.package_id,
-                "--module", "did_registry",
-                "--function", "update_verification_status",
-                "--args", 
-                &self.registry_id,                    // registry
-                &self.cap_id,                         // cap
-                user_did_id,                          // user_did (the UserDID object ID we extracted)
-                &verified.to_string(),                // verified
-                &signature_b64,                       // nautilus_signature
-                &signature_timestamp_ms.to_string(),  // signature_timestamp_ms
-                &evidence_hash_b64,                   // evidence_hash
-                &self.clock_id,                       // clock
-                "--gas-budget", "10000000"
-            ])
-            .output()
-            .map_err(|e| anyhow!("Failed to execute sui command: {}", e))?;
+        // Execute sui client call via host proxy
+        let client = reqwest::Client::new();
+        let call_data = serde_json::json!({
+            "package_id": self.package_id,
+            "module": "did_registry",
+            "function": "update_verification_status",
+            "args": [
+                self.registry_id.clone(),                    // registry
+                self.cap_id.clone(),                         // cap
+                user_did_id,                                 // user_did (the UserDID object ID we extracted)
+                verified.to_string(),                        // verified
+                signature_b64,                               // nautilus_signature
+                signature_timestamp_ms.to_string(),          // signature_timestamp_ms
+                evidence_hash_b64,                           // evidence_hash
+                self.clock_id.clone()                        // clock
+            ],
+            "gas_budget": "10000000"
+        });
+
+        let response = client
+            .post("http://3:9999/sui/client/call")
+            .json(&call_data)
+            .send()
+            .await
+            .map_err(|e| anyhow!("Failed to execute sui command via proxy: {}", e))?;
+
+        let result: serde_json::Value = response
+            .json()
+            .await
+            .map_err(|e| anyhow!("Failed to parse response: {}", e))?;
 
         // Process the output
-        if output.status.success() {
+        if result["success"].as_bool().unwrap_or(false) {
             info!("update_verification_status executed successfully for user: {}", user_address);
-            info!("Output: {}", String::from_utf8_lossy(&output.stdout));
+            let output_str = result["stdout"].as_str().unwrap_or("");
+            info!("Output: {}", output_str);
             
-            if !output.stderr.is_empty() {
-                warn!("Warnings: {}", String::from_utf8_lossy(&output.stderr));
+            let stderr = result["stderr"].as_str().unwrap_or("");
+            if !stderr.is_empty() {
+                warn!("Warnings: {}", stderr);
             }
         } else {
+            let stderr = result["stderr"].as_str().unwrap_or("unknown error");
+            let stdout = result["stdout"].as_str().unwrap_or("");
+            let returncode = result["returncode"].as_i64().unwrap_or(-1);
+            
             error!("update_verification_status failed for user: {}", user_address);
-            error!("Exit code: {}", output.status.code().unwrap_or(-1));
-            error!("STDERR: {}", String::from_utf8_lossy(&output.stderr));
-            error!("STDOUT: {}", String::from_utf8_lossy(&output.stdout));
+            error!("Exit code: {}", returncode);
+            error!("STDERR: {}", stderr);
+            error!("STDOUT: {}", stdout);
             
             return Err(anyhow!("update_verification_status failed with exit code: {} - STDERR: {} - STDOUT: {}", 
-                output.status.code().unwrap_or(-1),
-                String::from_utf8_lossy(&output.stderr),
-                String::from_utf8_lossy(&output.stdout)));
+                returncode, stderr, stdout));
         }
 
         Ok(())
