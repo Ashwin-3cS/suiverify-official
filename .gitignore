@@ -1,12 +1,12 @@
 
 #backend ignores
 **/target/
-nautilus_infra/verification-backend/venv
-nautilus_infra/verification-backend/app/services/__pycache__
-nautilus_infra/verification-backend/app/models/__pycache__
-nautilus_infra/verification-backend/app/routers/__pycache__
-nautilus_infra/verification-backend/app/database/__pycache__
-nautilus_infra/verification-backend/__pycache__
+verification-backend/venv/
+verification-backend/app/services/__pycache__/
+verification-backend/app/models/__pycache__/
+verification-backend/app/routers/__pycache__/
+verification-backend/app/database/__pycache__/
+verification-backend/__pycache__/
 
 # frontend ignores
 frontend/node_modules/
@@ -18,6 +18,8 @@ frontend/.env
 # contract ignores
 contracts/build
 
-
+# nautilus infra ignores
 nautilus_infra/secrets.json
+
+
 

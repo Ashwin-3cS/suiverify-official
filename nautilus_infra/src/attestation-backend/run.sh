@@ -16,8 +16,7 @@ set -e # Exit immediately if a command exits with a non-zero status
 echo "Current directory: $(pwd)"
 echo "Available files in root:"
 ls -la / | head -10
-export PYTHONPATH=/lib/python3.11:/usr/local/lib/python3.11/lib-dynload:/usr/local/lib/python3.11/site-packages:/lib
-export LD_LIBRARY_PATH=/lib:/usr/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/lib:$LD_LIBRARY_PATH
 
 # Assign an IP address to local loopback
 busybox ip addr add 127.0.0.1/32 dev lo
@@ -61,15 +60,7 @@ else
     echo "No attestation_server.env found, using defaults"
 fi
 
-# Load Python service environment variables
-if [ -f "/verification-backend.env" ]; then
-    echo "Loading Python service environment from verification-backend.env"
-    set -a  # automatically export all variables
-    source /verification-backend.env
-    set +a  # stop automatically exporting
-else
-    echo "No verification-backend.env found, using defaults"
-fi
+# Python service now runs externally - no env loading needed
 
 echo "Environment variables configured from .env files"
 
@@ -89,9 +80,6 @@ echo "Redis URL overridden to use local forwarding: $REDIS_URL"
 echo "Redis service configured to use external Redis Cloud"
 echo "No local Redis forwarding required"
 
-# Listens on Local VSOCK Port 8000 (Python service) and forwards to localhost 8000
-socat VSOCK-LISTEN:8000,reuseaddr,fork TCP:localhost:8000 &
-
 # Listens on Local VSOCK Port 4000 (Rust service) and forwards to localhost 4000
 socat VSOCK-LISTEN:4000,reuseaddr,fork TCP:localhost:4000 &
 
@@ -101,22 +89,14 @@ socat TCP-LISTEN:9999,reuseaddr,fork VSOCK-CONNECT:3:9999 &
 # Forward Redis requests to CID 3 (parent) for Redis Cloud access
 socat TCP-LISTEN:6379,reuseaddr,fork VSOCK-CONNECT:3:6379 &
 
-# Set Python path for verification-backend
-export PYTHONPATH="/usr/local/lib/python3.11/site-packages:$PYTHONPATH"
-
 echo "Starting Rust attestation-server on port 4000..."
 /attestation_server &
 RUST_SERVER_PID=$!
 
-echo "Starting Python verification service on port 8000..."
-cd /verification-backend
-python3 main.py &
-PYTHON_SERVER_PID=$!
-
-echo "Both services started:"
+echo "Enclave service started:"
 echo "  - Rust attestation-server: PID $RUST_SERVER_PID (port 4000)"
-echo "  - Python verification service: PID $PYTHON_SERVER_PID (port 8000)"
-echo "  - Main exposed port: 8000 (Python service)"
+echo "  - Python verification service runs externally"
+echo "  - Main exposed port: 4000 (Rust service)"
 
-# Wait for both processes
-wait $RUST_SERVER_PID $PYTHON_SERVER_PID
+# Wait for Rust process
+wait $RUST_SERVER_PID

@@ -22,30 +22,7 @@ FROM stagex/user-cpio@sha256:2695e1b42f93ec3ea0545e270f0fda4adca3cb48d0526da0195
 FROM stagex/user-socat:local@sha256:acef3dacc5b805d0eaaae0c2d13f567bf168620aea98c8d3e60ea5fd4e8c3108 AS user-socat
 FROM stagex/user-jq@sha256:ced6213c21b570dde1077ef49966b64cbf83890859eff83f33c82620520b563e AS user-jq
 
-# Python dependencies build stage
-FROM python:3.11-slim AS python-deps
-WORKDIR /deps
-
-# Install system dependencies needed for the packages
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    make \
-    cmake \
-    pkg-config \
-    libhdf5-dev \
-    libgl1-mesa-dri \
-    libglib2.0-0 \
-    libsm6 \
-    libxrender-dev \
-    libgomp1 \
-    libgthread-2.0-0 \
-    libglu1-mesa \
-    zlib1g-dev
-
-COPY verification-backend/requirements.txt .
-# Install with pre-built wheels when possible, only compile when necessary
-RUN pip install --no-cache-dir --target=packages -r requirements.txt
+# Python dependencies removed - verification backend now runs externally
 
 FROM scratch as base
 ENV TARGET=x86_64-unknown-linux-musl
@@ -95,7 +72,6 @@ ENV KBUILD_BUILD_TIMESTAMP=1
 RUN mkdir initramfs/
 COPY --from=user-linux-nitro /nsm.ko initramfs/nsm.ko
 COPY --from=core-busybox . initramfs
-COPY --from=core-python . initramfs
 COPY --from=core-musl . initramfs
 COPY --from=core-zlib . initramfs
 COPY --from=core-ca-certificates /etc/ssl/certs initramfs/etc/ssl/certs/
@@ -107,29 +83,11 @@ RUN cp /target/${TARGET}/release/init initramfs/
 RUN cp /src/attestation-backend/target/${TARGET}/release/attestation_server initramfs/
 RUN cp /src/attestation-backend/run.sh initramfs/
 
-# Copy Python verification service
-COPY verification-backend/ initramfs/verification-backend/
-
 # Copy environment configuration files (.env only approach)
 # Note: Environment variable precedence in container:
 # 1. .env files - HIGHEST priority
 # 2. Default values in code - LOWEST priority
 RUN cp /src/attestation-backend/.env initramfs/attestation_server.env 2>/dev/null || echo "# Rust service env file" > initramfs/attestation_server.env
-RUN cp /verification-backend/.env initramfs/verification-backend.env 2>/dev/null || echo "# Python service env file" > initramfs/verification-backend.env
-
-# Copy Python dependencies from the separate build stage
-RUN mkdir -p initramfs/usr/local/lib/python3.11/site-packages
-COPY --from=python-deps /deps/packages/ initramfs/usr/local/lib/python3.11/site-packages/
-
-# Copy SSL libraries into initramfs for Python SSL module support
-RUN mkdir -p initramfs/usr/lib initramfs/lib
-RUN cp -r /usr/lib/libssl.so* initramfs/usr/lib/ 2>/dev/null || true
-RUN cp -r /usr/lib/libcrypto.so* initramfs/usr/lib/ 2>/dev/null || true
-RUN cp -r /lib/ld-musl-x86_64.so* initramfs/lib/ 2>/dev/null || true
-
-# Ensure Python path is set correctly in the initramfs
-RUN echo 'export PYTHONPATH="/usr/local/lib/python3.11/site-packages:$PYTHONPATH"' > initramfs/python_env.sh
-RUN chmod +x initramfs/python_env.sh
 
 RUN <<-EOF
     set -eux
