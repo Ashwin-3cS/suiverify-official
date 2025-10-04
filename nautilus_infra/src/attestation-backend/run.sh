@@ -13,7 +13,10 @@
 # - Launches nautilus-server
 
 set -e # Exit immediately if a command exits with a non-zero status
-echo "run.sh script is running"
+echo "=== DEBUG: run.sh script is running ==="
+echo "Current directory: $(pwd)"
+echo "Available files in root:"
+ls -la / | head -10
 export PYTHONPATH=/lib/python3.11:/usr/local/lib/python3.11/lib-dynload:/usr/local/lib/python3.11/site-packages:/lib
 export LD_LIBRARY_PATH=/lib:$LD_LIBRARY_PATH
 
@@ -74,6 +77,11 @@ ls -la /sui || echo "sui binary not found"
 ls -la /.sui/ || echo ".sui config directory not found"
 echo "Current HOME: $HOME"
 echo "Current PATH: $PATH"
+
+# TEMPORARY: Exit early for debugging
+echo "=== EARLY EXIT FOR DEBUGGING ==="
+echo "Exiting run.sh early to test boot process"
+exit 0
 
 # Run traffic forwarder in background and start the server
 # Forwards traffic from 127.0.0.x -> Port 443 at CID 3 Listening on port 800x
