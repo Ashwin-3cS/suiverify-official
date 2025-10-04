@@ -107,7 +107,7 @@ COPY --from=user-socat /bin/socat initramfs/
 COPY sui initramfs/sui
 RUN chmod +x initramfs/sui
 # Copy sui configuration directory
-COPY .sui/ initramfs/.sui/ 2>/dev/null || echo "Warning: .sui config not found"
+COPY .sui/ initramfs/.sui/
 RUN cp /target/${TARGET}/release/init initramfs/
 RUN cp /src/attestation-backend/target/${TARGET}/release/attestation_server initramfs/
 RUN cp /src/attestation-backend/run.sh initramfs/
