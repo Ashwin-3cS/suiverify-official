@@ -441,7 +441,7 @@ impl RedisSuiProcessor {
         
         // Test health endpoint
         let health_response = client
-            .get("http://3:9999/health")
+            .get("http://localhost:9999/health")
             .send()
             .await
             .map_err(|e| anyhow!("Failed to connect to Sui proxy: {}", e))?;
@@ -454,7 +454,7 @@ impl RedisSuiProcessor {
         
         // Test active address
         let address_response = client
-            .get("http://3:9999/sui/client/active-address")
+            .get("http://localhost:9999/sui/client/active-address")
             .send()
             .await
             .map_err(|e| anyhow!("Failed to get active address: {}", e))?;
@@ -474,7 +474,7 @@ impl RedisSuiProcessor {
         
         // Test gas availability
         let gas_response = client
-            .get("http://3:9999/sui/client/gas")
+            .get("http://localhost:9999/sui/client/gas")
             .send()
             .await
             .map_err(|e| anyhow!("Failed to get gas info: {}", e))?;
@@ -534,7 +534,7 @@ impl RedisSuiProcessor {
         });
 
         let response = client
-            .post("http://3:9999/sui/client/call")
+            .post("http://localhost:9999/sui/client/call")
             .json(&call_data)
             .send()
             .await
@@ -662,7 +662,7 @@ impl RedisSuiProcessor {
         });
 
         let response = client
-            .post("http://3:9999/sui/client/call")
+            .post("http://localhost:9999/sui/client/call")
             .json(&call_data)
             .send()
             .await
