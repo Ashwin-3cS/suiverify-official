@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sui CLI Proxy Service
+Sui CLI Proxy Services
 Runs on the host and provides HTTP API for Sui CLI calls from the enclave
 
 Requirements: pip install flask
