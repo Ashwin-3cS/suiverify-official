@@ -79,7 +79,7 @@ COPY . .
 
 RUN cargo build --workspace --locked --no-default-features --release --target x86_64-unknown-linux-musl
 
-WORKDIR /src/attestation_server
+WORKDIR /src/attestation-backend
 
 # Clean environment - Redis-based build (no Kafka dependencies)
 ENV RUSTFLAGS="-C target-feature=+crt-static -C relocation-model=static"
@@ -87,8 +87,8 @@ ENV RUSTFLAGS="-C target-feature=+crt-static -C relocation-model=static"
 # Remove old Cargo.lock to allow fresh dependency resolution with Redis
 RUN rm -f Cargo.lock
 
-# Build with Redis (pure Rust) - no cmake/C dependencies
-RUN cargo build --no-default-features --features aws --release --target x86_64-unknown-linux-musl
+# Build attestation server with Redis (pure Rust) - no cmake/C dependencies
+RUN cargo build --release --target x86_64-unknown-linux-musl
 
 WORKDIR /build_cpio
 ENV KBUILD_BUILD_TIMESTAMP=1
@@ -102,10 +102,10 @@ COPY --from=core-busybox /bin/sh initramfs/sh
 COPY --from=user-jq /bin/jq initramfs/
 COPY --from=user-socat /bin/socat initramfs/
 RUN cp /target/${TARGET}/release/init initramfs/
-RUN cp /src/attestation_server/target/${TARGET}/release/attestation_server initramfs/
-RUN cp /src/attestation_server/traffic_forwarder.py initramfs/
-RUN cp /src/attestation_server/run.sh initramfs/
-RUN cp /src/attestation_server/allowed_endpoints.yaml initramfs/
+RUN cp /src/attestation-backend/target/${TARGET}/release/attestation_server initramfs/
+RUN cp /src/attestation-backend/traffic_forwarder.py initramfs/
+RUN cp /src/attestation-backend/run.sh initramfs/
+RUN cp /src/attestation-backend/allowed_endpoints.yaml initramfs/
 
 # Copy Python verification service
 COPY verification-backend/ initramfs/verification-backend/
@@ -114,7 +114,7 @@ COPY verification-backend/ initramfs/verification-backend/
 # Note: Environment variable precedence in container:
 # 1. .env files - HIGHEST priority
 # 2. Default values in code - LOWEST priority
-RUN cp /src/attestation_server/.env initramfs/attestation_server.env 2>/dev/null || echo "# Rust service env file" > initramfs/attestation_server.env
+RUN cp /src/attestation-backend/.env initramfs/attestation_server.env 2>/dev/null || echo "# Rust service env file" > initramfs/attestation_server.env
 RUN cp /verification-backend/.env initramfs/verification-backend.env 2>/dev/null || echo "# Python service env file" > initramfs/verification-backend.env
 
 # Copy Python dependencies from the separate build stage
