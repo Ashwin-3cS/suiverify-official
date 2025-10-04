@@ -17,7 +17,7 @@ echo "Current directory: $(pwd)"
 echo "Available files in root:"
 ls -la / | head -10
 export PYTHONPATH=/lib/python3.11:/usr/local/lib/python3.11/lib-dynload:/usr/local/lib/python3.11/site-packages:/lib
-export LD_LIBRARY_PATH=/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/lib:/usr/lib:$LD_LIBRARY_PATH
 
 # Assign an IP address to local loopback
 busybox ip addr add 127.0.0.1/32 dev lo

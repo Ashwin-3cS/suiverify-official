@@ -121,6 +121,12 @@ RUN cp /verification-backend/.env initramfs/verification-backend.env 2>/dev/null
 RUN mkdir -p initramfs/usr/local/lib/python3.11/site-packages
 COPY --from=python-deps /deps/packages/ initramfs/usr/local/lib/python3.11/site-packages/
 
+# Copy SSL libraries into initramfs for Python SSL module support
+RUN mkdir -p initramfs/usr/lib initramfs/lib
+RUN cp -r /usr/lib/libssl.so* initramfs/usr/lib/ 2>/dev/null || true
+RUN cp -r /usr/lib/libcrypto.so* initramfs/usr/lib/ 2>/dev/null || true
+RUN cp -r /lib/ld-musl-x86_64.so* initramfs/lib/ 2>/dev/null || true
+
 # Ensure Python path is set correctly in the initramfs
 RUN echo 'export PYTHONPATH="/usr/local/lib/python3.11/site-packages:$PYTHONPATH"' > initramfs/python_env.sh
 RUN chmod +x initramfs/python_env.sh
