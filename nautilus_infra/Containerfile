@@ -103,9 +103,7 @@ COPY --from=user-jq /bin/jq initramfs/
 COPY --from=user-socat /bin/socat initramfs/
 RUN cp /target/${TARGET}/release/init initramfs/
 RUN cp /src/attestation-backend/target/${TARGET}/release/attestation_server initramfs/
-RUN cp /src/attestation-backend/traffic_forwarder.py initramfs/
 RUN cp /src/attestation-backend/run.sh initramfs/
-RUN cp /src/attestation-backend/allowed_endpoints.yaml initramfs/
 
 # Copy Python verification service
 COPY verification-backend/ initramfs/verification-backend/
