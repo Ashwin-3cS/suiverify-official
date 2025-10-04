@@ -25,8 +25,8 @@ out/enclaveos.tar: out \
 run: out/nitro.eif
 	sudo nitro-cli \
 		run-enclave \
-		--cpu-count 6 \
-		--memory 26624 \
+		--cpu-count 4 \
+		--memory 4096 \
 		--eif-path out/nitro.eif
 	@echo "Enclave running with integrated services:"
 	@echo "  - Rust attestation-server with Redis consumer (internal port 4000)"
@@ -38,8 +38,8 @@ run: out/nitro.eif
 run-debug: out/nitro.eif
 	sudo nitro-cli \
 		run-enclave \
-		--cpu-count 6 \
-		--memory 26624 \
+		--cpu-count 4 \
+		--memory 4096 \
 		--eif-path out/nitro.eif \
 		--debug-mode \
 		--attach-console
