@@ -1,0 +1,40 @@
+# Rust build artifacts
+/target/
+target/
+
+# Cargo lock file (uncomment if this is an executable, not a library)
+# Cargo.lock
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+secrets.json
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# Python (for sui_proxy.py)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Backup files
+*~
+*.bak
+*.orig
