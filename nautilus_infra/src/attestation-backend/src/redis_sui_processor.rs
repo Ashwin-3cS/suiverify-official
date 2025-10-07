@@ -169,7 +169,7 @@ impl RedisSuiProcessor {
             package_id: std::env::var("SUI_PACKAGE_ID")
                 .unwrap_or_else(|_| "0x6ec40d30e636afb906e621748ee60a9b72bc59a39325adda43deadd28dc89e09".to_string()),
             registry_id: std::env::var("SUI_REGISTRY_ID")
-                .unwrap_or_else(|_| "0x000af5ea941c01e426968d91a420018b9746c493e6fb2512dac4f20f93005748".to_string()),
+                .unwrap_or_else(|_| "0x2c6962f40c84a7df1d40c74ab05c7f60c9afdbae8129cfe507ced948a02cbdc4".to_string()),
             cap_id: std::env::var("SUI_CAP_ID")
                 .unwrap_or_else(|_| "0x9aa20287121e2d325405097c54b5a2519a5d3f745ca74d47358a490dc94914cc".to_string()),
             clock_id: std::env::var("SUI_CLOCK_ID")
