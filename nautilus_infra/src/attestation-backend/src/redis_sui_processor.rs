@@ -167,11 +167,11 @@ impl RedisSuiProcessor {
                 .unwrap_or_else(|_| "rust_processor_1".to_string()),
             throughput_tracker: ThroughputTracker::new(),
             package_id: std::env::var("SUI_PACKAGE_ID")
-                .unwrap_or_else(|_| "0x3611276dabf733007d7975e17989e505eb93e11f4998f93d5c74c3a44231833d".to_string()),
+                .unwrap_or_else(|_| "0x6ec40d30e636afb906e621748ee60a9b72bc59a39325adda43deadd28dc89e09".to_string()),
             registry_id: std::env::var("SUI_REGISTRY_ID")
-                .unwrap_or_else(|_| "0xea43902e5184fc2cbbc194e63c236321d7cd4aebd006b2d4a7c76f8f03f194b9".to_string()),
+                .unwrap_or_else(|_| "0x000af5ea941c01e426968d91a420018b9746c493e6fb2512dac4f20f93005748".to_string()),
             cap_id: std::env::var("SUI_CAP_ID")
-                .unwrap_or_else(|_| "0x678a8ad11edf87246cafad705bed96960990b8d94c7708a0dce4ba68bfeec13a".to_string()),
+                .unwrap_or_else(|_| "0x9aa20287121e2d325405097c54b5a2519a5d3f745ca74d47358a490dc94914cc".to_string()),
             clock_id: std::env::var("SUI_CLOCK_ID")
                 .unwrap_or_else(|_| "0x0000000000000000000000000000000000000000000000000000000000000006".to_string()),
         })
